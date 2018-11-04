@@ -7,6 +7,7 @@
     <color name="grey">#00ffffff</color>
     <color name="fonbtn">#00ccb4</color>
     <color name="text">#059097</color>
+    <color name="red">#e1ff0000</color>
 
     <color name = "background">#e86dc3ff</color>
     <color name = "menu">#b5284c63</color>

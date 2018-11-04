@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.heads.thinking.headhelper">
 
+    <uses-permission android:name="android.permission.INTERNET"></uses-permission>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -9,21 +11,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppCompat">
+        <activity android:name=".SplashActivity">
 
-        <activity
-            android:name=".MainActivity"
-            android:label="@string/app_name"
-            android:theme="@style/AppCompat">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.HOME" />
-            </intent-filter>
-        </activity>
-
-        <activity
-            android:name=".SignInActivity"
-            android:theme="@style/AppCompat">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -31,17 +20,26 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".SignUpActivity"
+        <activity
+            android:name=".MainActivity"
             android:theme="@style/AppCompat">
+            <intent-filter>
+                <action android:name="ChatActivity"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
         </activity>
 
-        <activity android:name=".NewsViewerActivity"
-            android:theme="@style/AppCompat">
-        </activity>
+        <activity
+            android:name=".SignInActivity"
+            android:theme="@style/AppCompat" />
 
-        <meta-data
-            android:name="preloaded_fonts"
-            android:resource="@array/preloaded_fonts" />
+        <activity
+            android:name=".SignUpActivity2"
+            android:theme="@style/AppCompat" />
+
+        <activity
+            android:name=".NewsViewerActivity"
+            android:theme="@style/AppCompat" />
     </application>
 
 </manifest>
