@@ -3,12 +3,13 @@ package com.heads.thinking.headhelper
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
 import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
-import android.support.v4.app.FragmentPagerAdapter
 import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
+import android.widget.Toast
 import com.heads.thinking.headhelper.adapters.mainViewPagerAdapter
+import com.heads.thinking.headhelper.dialogs.ChangeGroupDialog
+import com.heads.thinking.headhelper.util.FirestoreUtil
 
 class MainActivity : AppCompatActivity() {
 
@@ -69,7 +70,18 @@ class MainActivity : AppCompatActivity() {
 
             }
         })
+
+        checkGroup()
     }
 
-
+    fun checkGroup() {
+        FirestoreUtil.getCurrentUser {
+            if (it.groupId == null || it.groupId == "")
+            {
+                Toast.makeText(this,"Вы не состоите в группе", Toast.LENGTH_SHORT).show()
+                val dialogFragment = ChangeGroupDialog()
+                dialogFragment.show(this.supportFragmentManager, "changeGroup")
+            }
+        }
+    }
 }

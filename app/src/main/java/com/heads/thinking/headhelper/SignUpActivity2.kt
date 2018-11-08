@@ -12,6 +12,8 @@ import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 
+//НЕИСПОЛЬЗУЕМАЯ АКТИВНОСТЬ
+
 class SignUpActivity2 : AppCompatActivity(), View.OnClickListener {
 
     private lateinit var emailET: EditText

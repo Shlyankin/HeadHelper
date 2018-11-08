@@ -12,6 +12,8 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.*
 
+// НЕИСПОЛЬЗУЕМАЯ АКТИВНОСТЬ
+
 class SignInActivity2 : AppCompatActivity(), View.OnClickListener {
 
     lateinit var auth: FirebaseAuth

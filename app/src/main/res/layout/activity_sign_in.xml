@@ -7,65 +7,79 @@
     android:layout_height="match_parent"
     tools:context=".SignInActivity">
 
-    <LinearLayout
-        android:id="@+id/linearLayout3"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:orientation="vertical"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-        <ImageView
-            android:id="@+id/logoView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="5"
-            android:adjustViewBounds="true"
-            app:srcCompat="@drawable/logo" />
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/constraint_layout2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context=".SignInActivity">
 
-        <ImageView
-            android:id="@+id/projectNameView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="2"
-            android:adjustViewBounds="true"
-            android:scaleType="fitCenter"
-            app:srcCompat="@drawable/head_helper" />
+            <LinearLayout
+                android:id="@+id/linearLayout3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="vertical"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
-    </LinearLayout>
+                <ImageView
+                    android:id="@+id/logoView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="5"
+                    android:adjustViewBounds="true"
+                    app:srcCompat="@drawable/logo" />
 
-    <android.support.v7.widget.CardView
-        android:id="@+id/signInBtn"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="6dp"
-        android:clickable="true"
-        android:onClick="onClick"
-        app:cardBackgroundColor="@color/fonbtn"
-        app:cardCornerRadius="30dp"
-        app:cardElevation="3dp"
-        app:contentPadding="10dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout3">
+                <ImageView
+                    android:id="@+id/projectNameView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="2"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitCenter"
+                    app:srcCompat="@drawable/head_helper"
+                    android:layout_margin="10dp"/>
 
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="Войти в аккаунт"
-            android:textAlignment="center"
-            android:textAllCaps="false"
-            android:textSize="30sp" />
-    </android.support.v7.widget.CardView>
+            </LinearLayout>
 
+            <android.support.v7.widget.CardView
+                android:id="@+id/signInBtn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="6dp"
+                android:clickable="true"
+                android:onClick="onClick"
+                app:cardBackgroundColor="@color/fonbtn"
+                app:cardCornerRadius="30dp"
+                app:cardElevation="3dp"
+                app:contentPadding="10dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/linearLayout3">
+
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="Войти в аккаунт"
+                    android:textAlignment="center"
+                    android:textAllCaps="false"
+                    android:textSize="30sp" />
+            </android.support.v7.widget.CardView>
+
+        </android.support.constraint.ConstraintLayout>
+
+    </ScrollView>
 </android.support.constraint.ConstraintLayout>

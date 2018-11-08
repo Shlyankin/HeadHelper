@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 apply plugin: 'kotlin-android'
-
+apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'com.google.gms.google-services'
 
@@ -14,6 +14,8 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -24,6 +26,9 @@ android {
 }
 
 dependencies {
+    //kotlin annotation processor
+    apply plugin: 'kotlin-kapt'
+
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.android.support:appcompat-v7:28.0.0'
@@ -39,11 +44,24 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth:16.0.5'
     implementation 'com.firebaseui:firebase-ui-auth:4.1.0'
     implementation 'com.google.firebase:firebase-firestore:17.1.2'
+    implementation 'com.google.firebase:firebase-storage:16.0.4'
+    implementation 'com.firebaseui:firebase-ui-storage:4.1.0'
+
+    implementation 'com.google.firebase:firebase-messaging:17.3.4'
 
     //anko
     implementation "org.jetbrains.anko:anko:$anko_version"
     implementation "org.jetbrains.anko:anko-design:$anko_version"
     implementation "org.jetbrains.anko:anko-coroutines:$anko_version"
+
+    //glide
+    implementation 'com.github.bumptech.glide:glide:4.8.0'
+    implementation 'com.github.bumptech.glide:annotations:4.8.0'
+    kapt 'com.github.bumptech.glide:compiler:4.8.0'
+    //coroutines
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.0.0'
+
+    implementation 'com.android.support:multidex:1.0.3'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'

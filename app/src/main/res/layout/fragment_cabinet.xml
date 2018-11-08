@@ -77,6 +77,17 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
+
+                    <ImageButton
+                        android:id="@+id/makePhotoBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@android:color/transparent"
+                        android:onClick="onClick"
+                        android:padding="5dp"
+                        android:src="@drawable/icon_camera"
+                        app:layout_constraintEnd_toEndOf="@+id/avatarIV"
+                        app:layout_constraintTop_toBottomOf="@+id/usernameTV" />
                 </android.support.constraint.ConstraintLayout>
             </android.support.v7.widget.CardView>
 

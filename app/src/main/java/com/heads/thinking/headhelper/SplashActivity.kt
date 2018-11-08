@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.heads.thinking.headhelper.dialogs.ChangeGroupDialog
 
 class SplashActivity : AppCompatActivity() {
 
@@ -20,7 +21,10 @@ class SplashActivity : AppCompatActivity() {
         super.onStart()
         startActivity(
                 if(currentUser != null) {
-                    if(currentUser.isEmailVerified) Intent(this, MainActivity::class.java)
+                    if(currentUser.isEmailVerified) {
+                        val dialogFragment = ChangeGroupDialog()
+                        Intent(this, MainActivity::class.java)
+                    }
                     else {
                         currentUser.sendEmailVerification().addOnCompleteListener {
                             if(it.isSuccessful) Toast.makeText(this, "Ваша почта не подтверждена. " +

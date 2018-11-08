@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "159193726146",
+    "firebase_url": "https://headhelper-54669.firebaseio.com",
+    "project_id": "headhelper-54669",
+    "storage_bucket": "headhelper-54669.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:159193726146:android:043bac211ecb854b",
+        "android_client_info": {
+          "package_name": "com.heads.thinking.headhelper"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "159193726146-scala8047k5vrg9eb99mk4d5svhnoghf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.heads.thinking.headhelper",
+            "certificate_hash": "6cde2c038124d5a9a9a4a05ccc3b396f38da11eb"
+          }
+        },
+        {
+          "client_id": "159193726146-p017bqkb4sdjps3mhd18k7dc9smosgvg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCYNGwwgWv9pYdDKfKG3mrt1aeskcxsqD0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "159193726146-p017bqkb4sdjps3mhd18k7dc9smosgvg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

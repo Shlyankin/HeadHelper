@@ -2,18 +2,16 @@ package com.heads.thinking.headhelper
 
 import android.app.Activity
 import android.content.Intent
-import android.nfc.Tag
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.widget.CardView
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.ErrorCodes
 import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
+import com.heads.thinking.headhelper.util.FirestoreUtil
 import kotlinx.android.synthetic.main.activity_sign_in.*
 import org.jetbrains.anko.clearTask
 import org.jetbrains.anko.design.longSnackbar
@@ -60,6 +58,17 @@ class SignInActivity : AppCompatActivity(), View.OnClickListener {
             val response = IdpResponse.fromResultIntent(data)
 
             if (resultCode == Activity.RESULT_OK) {
+                /*
+                val progressDialog = indeterminateProgressDialog("Setting up your account")
+                FirestoreUtil.initCurrentUserIfFirstTime {
+                    startActivity(intentFor<MainActivity>().newTask().clearTask())
+
+                    val registrationToken = FirebaseInstanceId.getInstance().token
+                    MyFirebaseInstanceIDService.addTokenToFirestore(registrationToken)
+
+                    progressDialog.dismiss()
+                }
+                 */
                 val progressDialog = indeterminateProgressDialog("Проверка вашего аккаунта")
                 val currentUser = FirebaseAuth.getInstance().currentUser
                 if (currentUser != null) {
@@ -68,15 +77,17 @@ class SignInActivity : AppCompatActivity(), View.OnClickListener {
                                 .addOnCompleteListener {
                                     if (it.isSuccessful) {
                                         Toast.makeText(this, "Подтверждение аккаунта выслано на почту: ${currentUser.email}", Toast.LENGTH_SHORT).show()
+                                        progressDialog.dismiss()
                                     } else {
-                                        Log.e(TAG, "sendEmailVerification", it.exception)
                                         Toast.makeText(this, "Не удалось отправить подтверждение на почту: ${currentUser.email}", Toast.LENGTH_SHORT).show()
+                                        progressDialog.dismiss()
                                     }
                                 }
                     } else {
-                        //TODO: create account
-                        startActivity(intentFor<MainActivity>().newTask().clearTask())
-                        progressDialog.dismiss()
+                        FirestoreUtil.initCurrentUserIfFirstTime {
+                            startActivity(intentFor<MainActivity>().newTask().clearTask())
+                            progressDialog.dismiss()
+                        }
                     }
                 }
             } else if (resultCode == Activity.RESULT_CANCELED) {

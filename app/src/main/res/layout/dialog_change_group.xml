@@ -15,7 +15,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:lineSpacingExtra="8sp"
-        android:text="Помните, что новый пароль должен состоять не менее, чем из 6 символов!"
+        android:text="    Введите ID группы, к которой вы бы хотели присоединиться.
+    ID группы можно получить у старосты(создателя) группы.
+    Вы не можете состоять более чем в одной группе."
         android:textAlignment="viewStart"
         android:textAllCaps="false"
         android:textColor="@color/colorAccent"
@@ -23,19 +25,11 @@
         android:textStyle="bold|italic" />
 
     <EditText
-        android:id="@+id/oldPasswordET"
+        android:id="@+id/groupIdET"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:hint="старый пароль"
-        android:inputType="textPassword" />
-
-    <EditText
-        android:id="@+id/newPasswordET"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="новый пароль"
-        android:inputType="textPassword" />
+        android:hint="ID группы"
+        android:inputType="text" />
 
 </LinearLayout>
