@@ -1,9 +1,6 @@
 package com.heads.thinking.headhelper
 
 import android.app.Activity.RESULT_OK
-import android.app.Dialog
-import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
@@ -14,22 +11,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.EmailAuthProvider
 import android.support.v7.app.AlertDialog
-import android.util.Log
 import android.widget.*
 import com.firebase.ui.auth.AuthUI
-import com.google.firebase.storage.StorageReference
 import com.heads.thinking.headhelper.dialogs.ChangeGroupDialog
 import com.heads.thinking.headhelper.dialogs.ChangePasswordDialog
 import com.heads.thinking.headhelper.glide.GlideApp
 import com.heads.thinking.headhelper.util.CustomImageManager
 import com.heads.thinking.headhelper.util.StorageUtil
-import com.heads.thinking.headhelper.util.FirestoreUtil
+import com.heads.thinking.headhelper.util.CustomFirestoreUtil
 
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import org.jetbrains.anko.doAsyncResult
 import java.io.ByteArrayOutputStream
 
 
@@ -49,7 +40,7 @@ class CabinetFragment : Fragment(), View.OnClickListener {
 
     override fun onStart() {
         super.onStart()
-        FirestoreUtil.getCurrentUser {
+        CustomFirestoreUtil.getCurrentUser {
             if (this.isVisible) {
                 usersNameTV.setText(it.name)
                 if (it.profilePicturePath != null)
@@ -84,11 +75,11 @@ class CabinetFragment : Fragment(), View.OnClickListener {
         when(view!!.id) {
             R.id.changeGroupBtn -> {
                 val dialogFragment = ChangeGroupDialog()
-                dialogFragment.show(this.fragmentManager, "changeGroup")
+                dialogFragment.show(this.childFragmentManager, "changeGroup")
             }
             R.id.changePasswordBtn -> {
                 val dialogFragment = ChangePasswordDialog()
-                dialogFragment.show(this.fragmentManager, "changePassword")
+                dialogFragment.show(this.childFragmentManager, "changePassword")
             }
             R.id.signOutBtn -> {
                 signOut()
@@ -130,14 +121,14 @@ class CabinetFragment : Fragment(), View.OnClickListener {
             selectedImageBytes = outputStream.toByteArray()
 
             StorageUtil.uploadProfilePhoto(selectedImageBytes, { refPath: String ->
-                FirestoreUtil.updateCurrentUser(usersNameTV.text.toString(), refPath, null)
+                CustomFirestoreUtil.updateCurrentUser(usersNameTV.text.toString(), refPath, null)
                 GlideApp.with(this)
                         .load(StorageUtil.pathToReference(refPath))
                         .into(avatarIV)
-                Toast.makeText(this@CabinetFragment.context, "Фото загружено", Toast.LENGTH_SHORT).show()
+                Toast.makeText(App.instance, "Фото загружено", Toast.LENGTH_SHORT).show()
             })
         } else {
-            Toast.makeText(this@CabinetFragment.context, "Не удалось загрузить изображение", Toast.LENGTH_SHORT).show()
+            Toast.makeText(App.instance, "Не удалось загрузить изображение", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -148,47 +139,10 @@ class CabinetFragment : Fragment(), View.OnClickListener {
                         if(it.isSuccessful)
                             startActivity(Intent(this.context, SplashActivity::class.java))
                         else
-                            Toast.makeText(this.context, "Не получается выйти из аккаунта", Toast.LENGTH_SHORT)
+                            Toast.makeText(App.instance, "Не получается выйти из аккаунта", Toast.LENGTH_SHORT).show()
                     }
                 })
                 .setNegativeButton("Отмена", null)
                 .show()
-    }
-
-
-    fun onCreateChangePasswordDialog(): Dialog {
-        val builder = AlertDialog.Builder(this.context!!)
-
-        val inflater = this.layoutInflater
-        val dialogLayout = inflater.inflate(R.layout.dialog_change_password, view?.findViewById(R.id.dialogLayout))
-        val oldPassword = dialogLayout.findViewById<EditText>(R.id.oldPasswordET)
-        val newPassword = dialogLayout.findViewById<EditText>(R.id.newPasswordET)
-
-        builder.setView(dialogLayout)
-                .setPositiveButton("Сменить пароль", { dialog, id ->
-                    val oldPasswordString = oldPassword.text.toString()
-                    val newPasswordString = newPassword.text.toString()
-                    if(newPassword.length() < 6)
-                        Toast.makeText(this.context, "Пароль должен быть больше 6 символов. Попробуйте еще раз", Toast.LENGTH_SHORT)
-                    if(oldPassword.onCheckIsTextEditor() && newPassword.onCheckIsTextEditor()) {
-                        val userTemp = auth.getCurrentUser()
-                        val credential = EmailAuthProvider.getCredential(userTemp?.getEmail()!!, oldPasswordString)
-                        userTemp?.reauthenticate(credential)?.addOnCompleteListener{ task ->
-                            if (task.isSuccessful) {
-                                userTemp.updatePassword(newPasswordString).addOnCompleteListener{ task ->
-                                    if (task.isSuccessful) {
-                                        Toast.makeText(this.context, "Пароль изменен", Toast.LENGTH_SHORT).show()
-                                    } else {
-                                        Toast.makeText(this.context, "Ошибка. Пароль не изменен", Toast.LENGTH_SHORT).show()
-                                    }
-                                }
-                            } else {
-                                Toast.makeText(this.context, "Ошибка: " + task.exception!!.message, Toast.LENGTH_LONG).show()
-                            }
-                        }
-                        }
-                    })
-                .setNegativeButton("Отмена", null)
-        return builder.create()
     }
 }

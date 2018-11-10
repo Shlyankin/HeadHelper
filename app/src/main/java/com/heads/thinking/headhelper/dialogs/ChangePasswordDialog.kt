@@ -1,6 +1,7 @@
 package com.heads.thinking.headhelper.dialogs
 
 import android.app.Dialog
+import android.content.Context
 import android.content.DialogInterface
 import android.os.Bundle
 import android.support.v4.app.DialogFragment
@@ -12,8 +13,10 @@ import android.widget.EditText
 import android.widget.Toast
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthException
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.heads.thinking.headhelper.App
 import com.heads.thinking.headhelper.R
-import org.jetbrains.anko.find
 
 class ChangePasswordDialog : DialogFragment() {
 
@@ -40,21 +43,25 @@ class ChangePasswordDialog : DialogFragment() {
             val oldPasswordString = oldPasswordET.text.toString()
             val newPasswordString = newPasswordET.text.toString()
             if(newPasswordET.length() < 6)
-                Toast.makeText(this.context, "Пароль должен быть больше 6 символов. Попробуйте еще раз", Toast.LENGTH_SHORT)
-
-            val userTemp = FirebaseAuth.getInstance().getCurrentUser()
-            val credential = EmailAuthProvider.getCredential(userTemp?.getEmail()!!, oldPasswordString)
-            userTemp?.reauthenticate(credential)?.addOnCompleteListener{ task ->
-                if (task.isSuccessful) {
-                    userTemp.updatePassword(newPasswordString).addOnCompleteListener{ task ->
-                        if (task.isSuccessful) {
-                            Toast.makeText(this.context, "Пароль изменен", Toast.LENGTH_SHORT).show()
-                        } else {
-                            Toast.makeText(this.context, "Ошибка. Пароль не изменен", Toast.LENGTH_SHORT).show()
+                Toast.makeText(App.instance, "Пароль должен быть больше 6 символов. Попробуйте еще раз", Toast.LENGTH_SHORT).show()
+            else {
+                val userTemp = FirebaseAuth.getInstance().getCurrentUser()
+                val credential = EmailAuthProvider.getCredential(userTemp?.getEmail()!!, oldPasswordString)
+                userTemp?.reauthenticate(credential)?.addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        userTemp.updatePassword(newPasswordString).addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                Toast.makeText(App.instance, "Пароль изменен", Toast.LENGTH_SHORT).show()
+                            } else {
+                                Toast.makeText(App.instance, "Ошибка. Пароль не изменен", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    } else {
+                        when(task.exception!!) {
+                            is FirebaseAuthInvalidCredentialsException -> Toast.makeText(App.instance, "Вы неправильно ввели старый пароль", Toast.LENGTH_LONG).show()
+                            else -> Toast.makeText(App.instance, "Ошибка: " + task.exception!!.message.toString(), Toast.LENGTH_LONG).show()
                         }
                     }
-                } else {
-                    Toast.makeText(this.context, "Ошибка: " + task.exception!!.message, Toast.LENGTH_LONG).show()
                 }
             }
 
@@ -62,4 +69,6 @@ class ChangePasswordDialog : DialogFragment() {
         builder.setNegativeButton("Отмена", null)
         return builder.create()
     }
+
+
 }

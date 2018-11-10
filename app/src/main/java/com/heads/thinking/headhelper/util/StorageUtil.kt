@@ -3,7 +3,6 @@ package com.heads.thinking.headhelper.util
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
-import com.heads.thinking.headhelper.models.User
 import java.util.*
 
 
@@ -17,7 +16,7 @@ object StorageUtil {
 
     fun uploadProfilePhoto(imageBytes: ByteArray,
                            onSuccess: (imagePath: String) -> Unit) {
-        FirestoreUtil.getCurrentUser {
+        CustomFirestoreUtil.getCurrentUser {
             if (it.profilePicturePath != null && it.profilePicturePath != "")
                 storageInstance.reference.child(it.profilePicturePath).delete()
                         .addOnCompleteListener {
@@ -29,6 +28,14 @@ object StorageUtil {
                                         }
                             }
                         }
+            else
+                currentUserRef.child("profilePictures").delete().addOnCompleteListener {
+                    val ref = currentUserRef.child("profilePictures/${UUID.nameUUIDFromBytes(imageBytes)}")
+                    ref.putBytes(imageBytes)
+                            .addOnSuccessListener {
+                                onSuccess(ref.path)
+                            }
+                }
         }
     }
 

@@ -11,7 +11,7 @@ import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.ErrorCodes
 import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
-import com.heads.thinking.headhelper.util.FirestoreUtil
+import com.heads.thinking.headhelper.util.CustomFirestoreUtil
 import kotlinx.android.synthetic.main.activity_sign_in.*
 import org.jetbrains.anko.clearTask
 import org.jetbrains.anko.design.longSnackbar
@@ -60,7 +60,7 @@ class SignInActivity : AppCompatActivity(), View.OnClickListener {
             if (resultCode == Activity.RESULT_OK) {
                 /*
                 val progressDialog = indeterminateProgressDialog("Setting up your account")
-                FirestoreUtil.initCurrentUserIfFirstTime {
+                CustomFirestoreUtil.initCurrentUserIfFirstTime {
                     startActivity(intentFor<MainActivity>().newTask().clearTask())
 
                     val registrationToken = FirebaseInstanceId.getInstance().token
@@ -84,7 +84,7 @@ class SignInActivity : AppCompatActivity(), View.OnClickListener {
                                     }
                                 }
                     } else {
-                        FirestoreUtil.initCurrentUserIfFirstTime {
+                        CustomFirestoreUtil.initCurrentUserIfFirstTime {
                             startActivity(intentFor<MainActivity>().newTask().clearTask())
                             progressDialog.dismiss()
                         }
