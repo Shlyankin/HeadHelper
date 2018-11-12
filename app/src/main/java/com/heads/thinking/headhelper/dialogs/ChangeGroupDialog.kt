@@ -15,7 +15,7 @@ import com.heads.thinking.headhelper.R
 import com.heads.thinking.headhelper.util.CustomFirestoreUtil
 
 
-class ChangeGroupDialog(): DialogFragment() {
+class ChangeGroupDialog: DialogFragment() {
 
     lateinit var idGroupET: EditText
 
@@ -25,8 +25,8 @@ class ChangeGroupDialog(): DialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val inflater = getActivity()?.getLayoutInflater()
-        val builder: AlertDialog.Builder = AlertDialog.Builder(this!!.activity!!)
+        val inflater = activity?.layoutInflater
+        val builder: AlertDialog.Builder = AlertDialog.Builder(this.activity!!)
         val layoutInflater = inflater?.inflate(R.layout.dialog_change_group, null)
         builder.setView(layoutInflater)
 
@@ -36,16 +36,16 @@ class ChangeGroupDialog(): DialogFragment() {
 
         builder.setTitle("Смена группы")
         builder.setPositiveButton("Вступить в группу", { dialogInterface: DialogInterface, i: Int ->
-                CustomFirestoreUtil.changeGroup(idGroupET.text.toString(), {
-                    if(it.isSuccessful)
+                CustomFirestoreUtil.changeGroup(idGroupET.text.toString(), { isSuccessful: Boolean, message: String ->
+                    if(isSuccessful)
                         Toast.makeText(App.instance, "Вы сменили группу", Toast.LENGTH_SHORT).show()
                     else
                         Toast.makeText(App.instance, "Не получилось сменить группу", Toast.LENGTH_SHORT).show()
                 })
                 })
                 .setNeutralButton("Создать группу", { dialogInterface: DialogInterface, i: Int ->
-                    CustomFirestoreUtil.createGroup(idGroupET.text.toString()) {
-                        if(it.isSuccessful)
+                    CustomFirestoreUtil.createGroup(idGroupET.text.toString()) {isSuccessful: Boolean, message: String ->
+                        if(isSuccessful)
                             Toast.makeText(App.instance, "Вы создали группу", Toast.LENGTH_SHORT).show()
                         else
                             Toast.makeText(App.instance, "Не получилось создать группу", Toast.LENGTH_SHORT).show()

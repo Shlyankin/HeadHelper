@@ -6,11 +6,10 @@ import android.os.Bundle
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.heads.thinking.headhelper.dialogs.ChangeGroupDialog
 
 class SplashActivity : AppCompatActivity() {
 
-    val currentUser: FirebaseUser? = FirebaseAuth.getInstance().currentUser
+    private val currentUser: FirebaseUser? = FirebaseAuth.getInstance().currentUser
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,15 +21,14 @@ class SplashActivity : AppCompatActivity() {
         startActivity(
                 if(currentUser != null) {
                     if(currentUser.isEmailVerified) {
-                        val dialogFragment = ChangeGroupDialog()
                         Intent(this, MainActivity::class.java)
                     }
                     else {
                         currentUser.sendEmailVerification().addOnCompleteListener {
                             if(it.isSuccessful) Toast.makeText(this, "Ваша почта не подтверждена. " +
-                                    "Вам отправлено повторное письмо на почту: ${currentUser.email}", Toast.LENGTH_SHORT)
+                                    "Вам отправлено повторное письмо на почту: ${currentUser.email}", Toast.LENGTH_SHORT).show()
                             else Toast.makeText(this, "Ваша почта не подтверждена. " +
-                                    "Не получаеся оптравить письмо с подтверждением на почту: ${currentUser.email}", Toast.LENGTH_SHORT)
+                                    "Не получаеся оптравить письмо с подтверждением на почту: ${currentUser.email}", Toast.LENGTH_SHORT).show()
                         }
                         Intent(this, SignInActivity::class.java)
                     }

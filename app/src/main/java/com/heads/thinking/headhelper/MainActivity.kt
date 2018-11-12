@@ -22,15 +22,15 @@ class MainActivity : AppCompatActivity() {
     private val onNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
             R.id.navigation_chat -> {
-                viewPager.setCurrentItem(0)
+                viewPager.currentItem = 0
                 true
             }
             R.id.navigation_news -> {
-                viewPager.setCurrentItem(1)
+                viewPager.currentItem = 1
                 true
             }
             R.id.navigation_cabinet -> {
-                viewPager.setCurrentItem(2)
+                viewPager.currentItem = 2
                 true
             }
             else -> false
@@ -58,11 +58,8 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onPageSelected(position: Int) {
-                if(prevItemMenu != null)
-                    prevItemMenu.setChecked(false)
-                else
-                    navigation.menu.getItem(0).setChecked(false)
-                navigation.menu.getItem(position).setChecked(true)
+                navigation.menu.getItem(0).isChecked = false
+                navigation.menu.getItem(position).isChecked = true
                 prevItemMenu = navigation.menu.getItem(position)
             }
 
@@ -70,14 +67,12 @@ class MainActivity : AppCompatActivity() {
 
             }
         })
-
         checkGroup()
     }
 
-    fun checkGroup() {
+    private fun checkGroup() {
         CustomFirestoreUtil.getCurrentUser {
-            if (it.groupId == null || it.groupId == "")
-            {
+            if (it.groupId == null || it.groupId == "") {
                 Toast.makeText(this,"Вы не состоите в группе", Toast.LENGTH_SHORT).show()
                 val dialogFragment = ChangeGroupDialog()
                 dialogFragment.show(this.supportFragmentManager, "changeGroup")

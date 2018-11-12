@@ -49,5 +49,10 @@ object StorageUtil {
                 }
     }
 
+    fun uploadNewsImage(imageBytes: ByteArray,
+                        onSuccess: (imagePath: String) -> Unit) {
+        //TODO
+    }
+
     fun pathToReference(path: String) = storageInstance.getReference(path)
 }

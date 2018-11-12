@@ -10,7 +10,7 @@ class App : Application() {
         instance = this
     }
 
-    companion object {
+    companion object { //возможна утечка памяти
         var instance: Context? = null
             private set
     }

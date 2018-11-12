@@ -14,6 +14,7 @@ import com.google.firebase.auth.FirebaseAuth
 import android.support.v7.app.AlertDialog
 import android.widget.*
 import com.firebase.ui.auth.AuthUI
+import com.google.type.Date
 import com.heads.thinking.headhelper.dialogs.ChangeGroupDialog
 import com.heads.thinking.headhelper.dialogs.ChangePasswordDialog
 import com.heads.thinking.headhelper.glide.GlideApp
@@ -22,6 +23,7 @@ import com.heads.thinking.headhelper.util.StorageUtil
 import com.heads.thinking.headhelper.util.CustomFirestoreUtil
 
 import java.io.ByteArrayOutputStream
+import kotlin.concurrent.timer
 
 
 class CabinetFragment : Fragment(), View.OnClickListener {
@@ -34,15 +36,11 @@ class CabinetFragment : Fragment(), View.OnClickListener {
 
     var auth = FirebaseAuth.getInstance()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onStart() {
         super.onStart()
         CustomFirestoreUtil.getCurrentUser {
-            if (this.isVisible) {
-                usersNameTV.setText(it.name)
+            if (true) {
+                usersNameTV.text = it.name
                 if (it.profilePicturePath != null)
                     GlideApp.with(this)
                             .load(StorageUtil.pathToReference(it.profilePicturePath))
@@ -55,12 +53,12 @@ class CabinetFragment : Fragment(), View.OnClickListener {
                               savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_cabinet, container, false)
 
-        avatarIV = view.findViewById(R.id.avatarIV)
-
         val makePhotoBtn: ImageButton = view.findViewById(R.id.makePhotoBtn)
         val changeGroupBtn: Button = view.findViewById(R.id.changeGroupBtn)
         val changePasswordBtn: Button = view.findViewById(R.id.changePasswordBtn)
         val signOutBtn: Button = view.findViewById(R.id.signOutBtn)
+
+        avatarIV = view.findViewById(R.id.avatarIV)
         usersNameTV = view.findViewById(R.id.usernameTV)
 
         makePhotoBtn.setOnClickListener(this)
@@ -110,7 +108,8 @@ class CabinetFragment : Fragment(), View.OnClickListener {
         }
     }
 
-    fun setImage(uri: Uri) {
+    //устанавливает изображение в imageView по Uri
+    private fun setImage(uri: Uri) {
         val selectedImagePath = uri.toString()
         val selectedImageBmp = MediaStore.Images.Media
                 .getBitmap(activity?.contentResolver, Uri.parse(selectedImagePath))
@@ -121,10 +120,11 @@ class CabinetFragment : Fragment(), View.OnClickListener {
             selectedImageBytes = outputStream.toByteArray()
 
             StorageUtil.uploadProfilePhoto(selectedImageBytes, { refPath: String ->
-                CustomFirestoreUtil.updateCurrentUser(usersNameTV.text.toString(), refPath, null)
-                GlideApp.with(this)
-                        .load(StorageUtil.pathToReference(refPath))
-                        .into(avatarIV)
+                CustomFirestoreUtil.updateCurrentUserData("", refPath, null)
+                if(this.isVisible)
+                    GlideApp.with(this)
+                            .load(StorageUtil.pathToReference(refPath))
+                            .into(avatarIV)
                 Toast.makeText(App.instance, "Фото загружено", Toast.LENGTH_SHORT).show()
             })
         } else {
@@ -132,6 +132,7 @@ class CabinetFragment : Fragment(), View.OnClickListener {
         }
     }
 
+    //выход из акккаунта
     fun signOut() {
         AlertDialog.Builder(this.context!!).setTitle("Выйти из аккаунта?")
                 .setPositiveButton("Выйти", {dialogInterface, i ->

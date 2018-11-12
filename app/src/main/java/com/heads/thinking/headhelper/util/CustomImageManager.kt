@@ -73,11 +73,12 @@ object CustomImageManager {
                 chooserIntent = Intent.createChooser(intentList.removeAt(intentList.size - 1), "Choose your image source")
                 chooserIntent!!.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentList.toArray(arrayOf<Parcelable>()))
             }
-            return chooserIntent;
+            return chooserIntent
         }
     }
 
-    //not working
+    //не используется и не работает
+    /*
     fun getRealPathFromURI(activity: Activity, uri: Uri): String {
         val projection = arrayOf<String>(MediaStore.Images.Media.DATA)
         val cursor = activity.contentResolver.
@@ -87,7 +88,7 @@ object CustomImageManager {
                 .getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
         cursor.moveToFirst()
         return cursor.getString(columnIndex)
-    }
+    }*/
 
     private fun createTempImageFile(storageDir: File?): File {
         // Генерируем имя файла по текущему времени

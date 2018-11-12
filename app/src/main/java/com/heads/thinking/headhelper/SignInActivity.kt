@@ -21,8 +21,6 @@ import org.jetbrains.anko.newTask
 
 class SignInActivity : AppCompatActivity(), View.OnClickListener {
 
-    val TAG = "SignIn"
-
     private val CODE_SIGN_IN = 1;
     private lateinit var signInBtn: CardView
 
@@ -58,17 +56,6 @@ class SignInActivity : AppCompatActivity(), View.OnClickListener {
             val response = IdpResponse.fromResultIntent(data)
 
             if (resultCode == Activity.RESULT_OK) {
-                /*
-                val progressDialog = indeterminateProgressDialog("Setting up your account")
-                CustomFirestoreUtil.initCurrentUserIfFirstTime {
-                    startActivity(intentFor<MainActivity>().newTask().clearTask())
-
-                    val registrationToken = FirebaseInstanceId.getInstance().token
-                    MyFirebaseInstanceIDService.addTokenToFirestore(registrationToken)
-
-                    progressDialog.dismiss()
-                }
-                 */
                 val progressDialog = indeterminateProgressDialog("Проверка вашего аккаунта")
                 val currentUser = FirebaseAuth.getInstance().currentUser
                 if (currentUser != null) {

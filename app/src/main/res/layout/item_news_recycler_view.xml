@@ -62,7 +62,7 @@
                     android:textSize="26sp" />
 
                 <TextView
-                    android:id="@+id/itemsDateTV"
+                    android:id="@+id/itemDateTV"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
