@@ -9,7 +9,7 @@ import android.view.MenuItem
 import android.widget.Toast
 import com.heads.thinking.headhelper.adapters.mainViewPagerAdapter
 import com.heads.thinking.headhelper.dialogs.ChangeGroupDialog
-import com.heads.thinking.headhelper.util.CustomFirestoreUtil
+import com.heads.thinking.headhelper.util.FirestoreUtil
 
 class MainActivity : AppCompatActivity() {
 
@@ -71,7 +71,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkGroup() {
-        CustomFirestoreUtil.getCurrentUser {
+        FirestoreUtil.getCurrentUser {
             if (it.groupId == null || it.groupId == "") {
                 Toast.makeText(this,"Вы не состоите в группе", Toast.LENGTH_SHORT).show()
                 val dialogFragment = ChangeGroupDialog()

@@ -11,12 +11,12 @@ object StorageUtil {
 
     private val currentUserRef: StorageReference
         get() = storageInstance.reference
-                .child(FirebaseAuth.getInstance().currentUser?.uid
+                .child("users").child(FirebaseAuth.getInstance().currentUser?.uid
                         ?: throw NullPointerException("UID is null."))
 
     fun uploadProfilePhoto(imageBytes: ByteArray,
                            onSuccess: (imagePath: String) -> Unit) {
-        CustomFirestoreUtil.getCurrentUser {
+        FirestoreUtil.getCurrentUser {
             if (it.profilePicturePath != null && it.profilePicturePath != "")
                 storageInstance.reference.child(it.profilePicturePath).delete()
                         .addOnCompleteListener {
@@ -49,9 +49,14 @@ object StorageUtil {
                 }
     }
 
-    fun uploadNewsImage(imageBytes: ByteArray,
-                        onSuccess: (imagePath: String) -> Unit) {
-        //TODO
+    fun uploadNewsImage(imageBytes: ByteArray, imagePath: String,
+                        onComplete: (onSuccess: Boolean, message: String) -> Unit) {
+        FirestoreUtil.getCurrentUser {
+            storageInstance.reference.child(imagePath).putBytes(imageBytes)
+                    .addOnCompleteListener{
+                onComplete(it.isSuccessful, it.exception?.message ?: "")
+            }
+        }
     }
 
     fun pathToReference(path: String) = storageInstance.getReference(path)

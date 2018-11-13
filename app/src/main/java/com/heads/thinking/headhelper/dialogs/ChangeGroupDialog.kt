@@ -12,7 +12,7 @@ import android.widget.EditText
 import android.widget.Toast
 import com.heads.thinking.headhelper.App
 import com.heads.thinking.headhelper.R
-import com.heads.thinking.headhelper.util.CustomFirestoreUtil
+import com.heads.thinking.headhelper.util.FirestoreUtil
 
 
 class ChangeGroupDialog: DialogFragment() {
@@ -36,7 +36,7 @@ class ChangeGroupDialog: DialogFragment() {
 
         builder.setTitle("Смена группы")
         builder.setPositiveButton("Вступить в группу", { dialogInterface: DialogInterface, i: Int ->
-                CustomFirestoreUtil.changeGroup(idGroupET.text.toString(), { isSuccessful: Boolean, message: String ->
+                FirestoreUtil.changeGroup(idGroupET.text.toString(), { isSuccessful: Boolean, message: String ->
                     if(isSuccessful)
                         Toast.makeText(App.instance, "Вы сменили группу", Toast.LENGTH_SHORT).show()
                     else
@@ -44,7 +44,7 @@ class ChangeGroupDialog: DialogFragment() {
                 })
                 })
                 .setNeutralButton("Создать группу", { dialogInterface: DialogInterface, i: Int ->
-                    CustomFirestoreUtil.createGroup(idGroupET.text.toString()) {isSuccessful: Boolean, message: String ->
+                    FirestoreUtil.createGroup(idGroupET.text.toString()) { isSuccessful: Boolean, message: String ->
                         if(isSuccessful)
                             Toast.makeText(App.instance, "Вы создали группу", Toast.LENGTH_SHORT).show()
                         else

@@ -11,7 +11,7 @@ import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.ErrorCodes
 import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
-import com.heads.thinking.headhelper.util.CustomFirestoreUtil
+import com.heads.thinking.headhelper.util.FirestoreUtil
 import kotlinx.android.synthetic.main.activity_sign_in.*
 import org.jetbrains.anko.clearTask
 import org.jetbrains.anko.design.longSnackbar
@@ -71,7 +71,7 @@ class SignInActivity : AppCompatActivity(), View.OnClickListener {
                                     }
                                 }
                     } else {
-                        CustomFirestoreUtil.initCurrentUserIfFirstTime {
+                        FirestoreUtil.initCurrentUserIfFirstTime {
                             startActivity(intentFor<MainActivity>().newTask().clearTask())
                             progressDialog.dismiss()
                         }

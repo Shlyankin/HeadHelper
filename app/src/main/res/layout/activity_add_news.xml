@@ -20,7 +20,7 @@
         app:srcCompat="@drawable/icon_back" />
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/addImageBtn"
+        android:id="@+id/addImageFab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
@@ -28,10 +28,10 @@
         android:clickable="true"
         android:src="@android:drawable/ic_menu_camera"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/addNewsBtn" />
+        app:layout_constraintEnd_toStartOf="@+id/addNewsFab" />
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/addNewsBtn"
+        android:id="@+id/addNewsFab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"

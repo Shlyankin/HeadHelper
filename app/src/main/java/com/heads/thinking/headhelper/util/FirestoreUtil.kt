@@ -1,17 +1,19 @@
 package com.heads.thinking.headhelper.util
 
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.*
 import com.heads.thinking.headhelper.models.News
 import com.heads.thinking.headhelper.models.User
 
 
-object CustomFirestoreUtil {
+object FirestoreUtil {
     private val firestoreInstance: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
     private var groupReference: DocumentReference? = null
     private var currentUser: User? = null
 
+    private val currentUserDocRef: DocumentReference
+        get() = firestoreInstance.document("users/${FirebaseAuth.getInstance().currentUser?.uid
+                ?: throw NullPointerException("UID is null.")}")
 
     private fun getUpdatedCurrentUser(onComplete: (User) -> Unit) {
         currentUserDocRef.get()
@@ -29,6 +31,14 @@ object CustomFirestoreUtil {
             }
         } else {
             onComplete(currentUser!!)
+        }
+    }
+
+    fun addUserListener(onChange: (documentSnapshot: DocumentSnapshot?,
+                                   firebaseFirestoreException: FirebaseFirestoreException?) -> Unit) : ListenerRegistration {
+        return currentUserDocRef.addSnapshotListener{ documentSnapshot: DocumentSnapshot?,
+                                               firebaseFirestoreException: FirebaseFirestoreException? ->
+                onChange(documentSnapshot, firebaseFirestoreException)
         }
     }
 
@@ -53,9 +63,6 @@ object CustomFirestoreUtil {
             onComplete(true, groupReference)
     }
 
-    private val currentUserDocRef: DocumentReference
-        get() = firestoreInstance.document("users/${FirebaseAuth.getInstance().currentUser?.uid
-                ?: throw NullPointerException("UID is null.")}")
 
     fun initCurrentUserIfFirstTime(onComplete: () -> Unit) {
         currentUserDocRef.get().addOnSuccessListener { documentSnapshot ->
@@ -160,7 +167,7 @@ object CustomFirestoreUtil {
     fun sendNews(news: News, onComplete: (isSuccessful: Boolean, message: String) -> Unit) {
         groupRef { isSuccessful, documentReference ->
             if(isSuccessful) {
-                documentReference!!.collection("news").document().set(news).addOnCompleteListener{
+                documentReference!!.collection("news").document(news.id).set(news).addOnCompleteListener{
                     onComplete(it.isSuccessful, it.exception?.message ?: "")
                 }
             } else {
@@ -185,8 +192,19 @@ object CustomFirestoreUtil {
         }
     }
 
-    fun addNewsListener() {
-        //TODO
+    fun addNewsListener(onChange: (isSuccessful: Boolean, message: String, querySnapshot: QuerySnapshot?,
+                                   firebaseFirestoreException: FirebaseFirestoreException?) -> Unit) {
+        groupRef{ isSuccessful: Boolean, documentReference: DocumentReference? ->
+            if(isSuccessful) {
+                documentReference!!.collection("news").addSnapshotListener{
+                    querySnapshot: QuerySnapshot?, firebaseFirestoreException: FirebaseFirestoreException? ->
+                    onChange(isSuccessful, "", querySnapshot, firebaseFirestoreException)
+                }
+            }
+            else {
+                onChange(isSuccessful, "Не могу загрузить новости.\nПроверьте состоите ли вы в гурппе", null, null)
+            }
+        }
     }
 
     fun sendMessage() {

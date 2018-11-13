@@ -1,6 +1,8 @@
 package com.heads.thinking.headhelper
 
 import android.app.Activity.RESULT_OK
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
@@ -10,44 +12,28 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.google.firebase.auth.FirebaseAuth
 import android.support.v7.app.AlertDialog
 import android.widget.*
 import com.firebase.ui.auth.AuthUI
-import com.google.type.Date
 import com.heads.thinking.headhelper.dialogs.ChangeGroupDialog
 import com.heads.thinking.headhelper.dialogs.ChangePasswordDialog
 import com.heads.thinking.headhelper.glide.GlideApp
+import com.heads.thinking.headhelper.models.User
+import com.heads.thinking.headhelper.mvvm.UserViewModel
 import com.heads.thinking.headhelper.util.CustomImageManager
 import com.heads.thinking.headhelper.util.StorageUtil
-import com.heads.thinking.headhelper.util.CustomFirestoreUtil
+import com.heads.thinking.headhelper.util.FirestoreUtil
 
 import java.io.ByteArrayOutputStream
-import kotlin.concurrent.timer
 
 
 class CabinetFragment : Fragment(), View.OnClickListener {
 
-
+    private lateinit var user: User
     private lateinit var selectedImageBytes: ByteArray
 
     private lateinit var avatarIV: ImageView
     private lateinit var usersNameTV: TextView
-
-    var auth = FirebaseAuth.getInstance()
-
-    override fun onStart() {
-        super.onStart()
-        CustomFirestoreUtil.getCurrentUser {
-            if (true) {
-                usersNameTV.text = it.name
-                if (it.profilePicturePath != null)
-                    GlideApp.with(this)
-                            .load(StorageUtil.pathToReference(it.profilePicturePath))
-                            .into(avatarIV)
-            }
-        }
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -66,6 +52,21 @@ class CabinetFragment : Fragment(), View.OnClickListener {
         changePasswordBtn.setOnClickListener(this)
         signOutBtn.setOnClickListener(this)
 
+        val userViewModel : UserViewModel = ViewModelProviders.of(this).get(UserViewModel::class.java)
+        userViewModel.getUser().observe(this.activity!!, object : Observer<User> {
+
+            override fun onChanged(changedUser: User?) {
+                if (changedUser != null) {
+                    user = changedUser
+                    usersNameTV.text = changedUser.name
+                    if (changedUser.profilePicturePath != null)
+                        GlideApp.with(this@CabinetFragment)
+                                .load(StorageUtil.pathToReference(changedUser.profilePicturePath))
+                                .into(avatarIV)
+                }
+            }
+
+        })
         return view
     }
 
@@ -120,11 +121,7 @@ class CabinetFragment : Fragment(), View.OnClickListener {
             selectedImageBytes = outputStream.toByteArray()
 
             StorageUtil.uploadProfilePhoto(selectedImageBytes, { refPath: String ->
-                CustomFirestoreUtil.updateCurrentUserData("", refPath, null)
-                if(this.isVisible)
-                    GlideApp.with(this)
-                            .load(StorageUtil.pathToReference(refPath))
-                            .into(avatarIV)
+                FirestoreUtil.updateCurrentUserData("", refPath, null)
                 Toast.makeText(App.instance, "Фото загружено", Toast.LENGTH_SHORT).show()
             })
         } else {

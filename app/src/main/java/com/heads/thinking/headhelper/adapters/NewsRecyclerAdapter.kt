@@ -15,7 +15,7 @@ import com.heads.thinking.headhelper.glide.GlideApp
 import com.heads.thinking.headhelper.models.News
 import com.heads.thinking.headhelper.util.StorageUtil
 
-class NewsRecyclerAdapter(val context: Context, val list:List<News>): RecyclerView.Adapter<NewsRecyclerAdapter.ViewHolder>() {
+class NewsRecyclerAdapter(val context: Context, var list:List<News>): RecyclerView.Adapter<NewsRecyclerAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, p1: Int): ViewHolder {
         val viewHolder = LayoutInflater.from(parent.context).inflate(R.layout.item_news_recycler_view, parent, false)
@@ -27,7 +27,6 @@ class NewsRecyclerAdapter(val context: Context, val list:List<News>): RecyclerVi
         viewHolder.newsCardView.setOnClickListener({
             context.startActivity(Intent(context, NewsViewerActivity::class.java).apply {
                 putExtra("tittle", list[position].tittle)
-                putExtra("date", list[position].date)
                 putExtra("picturePath", list[position].picturePath)
                 putExtra("text", list[position].text)
             })
@@ -51,7 +50,6 @@ class NewsRecyclerAdapter(val context: Context, val list:List<News>): RecyclerVi
 
             //load attribute
             itemHeader.text = news.tittle
-            dateView.text = news.date
             if(news.picturePath != null)
                 GlideApp.with(imageView) // with??
                       .load(StorageUtil.pathToReference(news.picturePath))

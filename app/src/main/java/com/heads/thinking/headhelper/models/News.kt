@@ -5,8 +5,7 @@ data class News(
         val category: String,
         val picturePath: String?,
         val tittle: String,
-        val text: String,
-        val date: String
+        val text: String
 ) {
-    constructor(): this("", "", null, "", "", "")
+    constructor(): this("", "", null, "", "")
 }
