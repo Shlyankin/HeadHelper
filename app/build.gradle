@@ -40,7 +40,7 @@ dependencies {
     implementation 'de.hdodenhof:circleimageview:2.2.0'
 
     //firebase
-    implementation 'com.google.firebase:firebase-core:16.0.4'
+    implementation 'com.google.firebase:firebase-core:16.0.5'
     implementation 'com.google.firebase:firebase-auth:16.0.5'
     implementation 'com.firebaseui:firebase-ui-auth:4.1.0'
     implementation 'com.google.firebase:firebase-firestore:17.1.2'

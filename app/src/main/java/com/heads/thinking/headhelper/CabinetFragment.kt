@@ -23,6 +23,7 @@ import com.heads.thinking.headhelper.mvvm.UserViewModel
 import com.heads.thinking.headhelper.util.CustomImageManager
 import com.heads.thinking.headhelper.util.StorageUtil
 import com.heads.thinking.headhelper.util.FirestoreUtil
+import kotlinx.android.synthetic.main.fragment_cabinet.*
 
 import java.io.ByteArrayOutputStream
 
@@ -30,10 +31,10 @@ import java.io.ByteArrayOutputStream
 class CabinetFragment : Fragment(), View.OnClickListener {
 
     private lateinit var user: User
-    private lateinit var selectedImageBytes: ByteArray
 
     private lateinit var avatarIV: ImageView
     private lateinit var usersNameTV: TextView
+    private lateinit var groupIdTV: TextView
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -46,6 +47,7 @@ class CabinetFragment : Fragment(), View.OnClickListener {
 
         avatarIV = view.findViewById(R.id.avatarIV)
         usersNameTV = view.findViewById(R.id.usernameTV)
+        groupIdTV = view.findViewById(R.id.groupIdTV)
 
         makePhotoBtn.setOnClickListener(this)
         changeGroupBtn.setOnClickListener(this)
@@ -59,6 +61,7 @@ class CabinetFragment : Fragment(), View.OnClickListener {
                 if (changedUser != null) {
                     user = changedUser
                     usersNameTV.text = changedUser.name
+                    groupIdTV.text = changedUser.groupId ?: ""
                     if (changedUser.profilePicturePath != null)
                         GlideApp.with(this@CabinetFragment)
                                 .load(StorageUtil.pathToReference(changedUser.profilePicturePath))
@@ -111,6 +114,7 @@ class CabinetFragment : Fragment(), View.OnClickListener {
 
     //устанавливает изображение в imageView по Uri
     private fun setImage(uri: Uri) {
+        var selectedImageBytes: ByteArray
         val selectedImagePath = uri.toString()
         val selectedImageBmp = MediaStore.Images.Media
                 .getBitmap(activity?.contentResolver, Uri.parse(selectedImagePath))

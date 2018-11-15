@@ -37,7 +37,8 @@ class NewsViewModel: ViewModel() {
                     category    = doc.get("category") as String,
                     picturePath = doc.get("picturePath") as String?,
                     tittle      = doc.get("tittle") as String,
-                    text        = doc.get("text") as String )
+                    text        = doc.get("text") as String,
+                    authorRef   = doc.get("authorRef") as String?)
             news.add(examplerNews)
         }
         return news

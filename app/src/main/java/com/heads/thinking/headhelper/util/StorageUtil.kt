@@ -3,6 +3,7 @@ package com.heads.thinking.headhelper.util
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
+import com.google.firebase.storage.UploadTask
 import java.util.*
 
 
@@ -49,14 +50,17 @@ object StorageUtil {
                 }
     }
 
-    fun uploadNewsImage(imageBytes: ByteArray, imagePath: String,
-                        onComplete: (onSuccess: Boolean, message: String) -> Unit) {
-        FirestoreUtil.getCurrentUser {
-            storageInstance.reference.child(imagePath).putBytes(imageBytes)
-                    .addOnCompleteListener{
-                onComplete(it.isSuccessful, it.exception?.message ?: "")
+    fun uploadNewsImage(imageBytes: ByteArray, setUrl: (url: String) -> Unit) : UploadTask {
+        // или fromBytes, но тогда одинаковые изображения будут храниться одним файлом и при удалении одного удалится фото во всех новостях
+        val urlNews : String = UUID.randomUUID().toString()
+        setUrl(urlNews)
+        return storageInstance.reference.child(urlNews).putBytes(imageBytes)
+    }
+
+    fun deleteNewsImage(uriPath: String, OnComplete: (isSuccessful: Boolean) -> Unit) {
+            storageInstance.reference.child(uriPath).delete().addOnCompleteListener {
+                OnComplete(it.isSuccessful)
             }
-        }
     }
 
     fun pathToReference(path: String) = storageInstance.getReference(path)

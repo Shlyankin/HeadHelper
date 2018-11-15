@@ -34,6 +34,40 @@ object FirestoreUtil {
         }
     }
 
+    fun getMembers(onComplete: (isSuccessful: Boolean, message: String,  members: ArrayList<User>?) -> Unit) {
+        getCurrentUser {
+            if(it.groupId != null) {
+                firestoreInstance.collection("groups").document(it.groupId).collection("members").get()
+                        .addOnSuccessListener {
+                            if(!it.isEmpty) {
+                                val list: ArrayList<User> = ArrayList()
+                                for(document in it) {
+                                    list.add(document.toObject(User::class.java))
+                                }
+                                onComplete(true, "", list)
+                            } else {
+                                onComplete(true, "Никого нет в группе", ArrayList())
+                            }
+                        }
+            } else onComplete(false, "Вы не состоите в группе", null)
+        }
+    }
+
+    fun getUser(userPath: String, onComplete: (isSuccessful: Boolean, user: User?) -> Unit) {
+        firestoreInstance.collection("users").document(userPath).get()
+                .addOnSuccessListener {
+                    if(it.exists())
+                        onComplete(it.exists(), it.toObject(User::class.java)!!)
+                    else {
+                        onComplete(it.exists(), null)
+                    }
+                }
+                .addOnCanceledListener {
+                    onComplete(false, null)
+                }
+    }
+
+
     fun addUserListener(onChange: (documentSnapshot: DocumentSnapshot?,
                                    firebaseFirestoreException: FirebaseFirestoreException?) -> Unit) : ListenerRegistration {
         return currentUserDocRef.addSnapshotListener{ documentSnapshot: DocumentSnapshot?,
@@ -67,7 +101,8 @@ object FirestoreUtil {
     fun initCurrentUserIfFirstTime(onComplete: () -> Unit) {
         currentUserDocRef.get().addOnSuccessListener { documentSnapshot ->
             if (!documentSnapshot.exists()) {
-                val newUser = User(FirebaseAuth.getInstance().currentUser?.displayName ?: "", null, mutableListOf(), "")
+                val newUser = User(FirebaseAuth.getInstance().currentUser?.uid.toString(), FirebaseAuth.getInstance().currentUser?.displayName ?: "",
+                        null, mutableListOf(), null)
                 currentUserDocRef.set(newUser).addOnSuccessListener {
                     onComplete()
                 }
@@ -83,16 +118,23 @@ object FirestoreUtil {
         if (profilePicturePath != null)
             userFieldMap["profilePicturePath"] = profilePicturePath
         if (groupId != null) {
-            val groupReference = firestoreInstance.collection("groups").document("$groupId")
+            getCurrentUser { user: User ->
+                if (user.groupId != null && user.groupId != "")
+                    firestoreInstance.collection("groups")
+                            .document("${user.groupId}").collection("members")
+                            .document(FirebaseAuth.getInstance().currentUser?.uid.toString()).delete()
+            }
             userFieldMap["groupId"] = groupId
             val member = mutableMapOf<String, Any>()
             member [FirebaseAuth.getInstance().currentUser?.uid
                     ?: throw NullPointerException("UID is null.")] = FirebaseAuth.getInstance().currentUser!!.displayName.toString()
-            firestoreInstance.collection("groups")
-                    .document("${groupId}/members/${FirebaseAuth.getInstance().currentUser?.uid}").update(member)
-                    .addOnCompleteListener {
-                        updateGroupRef()
-                    }
+            firestoreInstance.collection("groups").document(groupId)
+                .collection("members").document(FirebaseAuth.getInstance().currentUser?.uid.toString())
+                    .set(mapOf(Pair("memberRef",
+                            FirebaseAuth.getInstance().currentUser?.uid.toString())))
+                .addOnCompleteListener {
+                    updateGroupRef()
+                }
         }
         currentUserDocRef.update(userFieldMap)
         getUpdatedCurrentUser { user: User -> } // update user object
@@ -103,36 +145,14 @@ object FirestoreUtil {
             onComplete(false, "Поле не задано")
             return
         }
-        getCurrentUser {user: User ->
-            val newGroupRef = firestoreInstance.collection("groups").document(newGroupId)
-            newGroupRef.get().addOnCompleteListener {
+        firestoreInstance.collection("groups").document(newGroupId).get()
+            .addOnCompleteListener {
                 if(it.isSuccessful && it.getResult()?.exists() ?: false) {
-                    onComplete(false, "Группа с данынм ID существует")
+                onComplete(false, "Группа с данынм ID существует")
                 } else {
-                    if (user.groupId != null && user.groupId != "")
-                        firestoreInstance.collection("groups").document("${user.groupId}")
-                                .collection("members").document(FirebaseAuth.getInstance().currentUser?.uid.toString()).delete()
-                    val allGroupsRef = firestoreInstance.collection("groups")
-                    val currentGroupRef = allGroupsRef.document(newGroupId)
-                    val curMemberRef = currentGroupRef.collection("members").document(FirebaseAuth.getInstance().currentUser?.uid.toString())
-
-                    curMemberRef.set(User(user.name, user.profilePicturePath, user.registrationTokens, newGroupId))
-                            .addOnCompleteListener() {
-                                if (it.isSuccessful)
-                                    updateCurrentUserData(user.name, user.profilePicturePath, newGroupId)
-                                onComplete(it.isSuccessful, it.exception?.message ?: "")
-                            }
+                    updateCurrentUserData(groupId = newGroupId)
                 }
             }
-        }
-    }
-
-    fun getUsers(onComplete: () -> Unit) {
-        //TODO add in users USER from firestore
-    }
-
-    fun addUsersListener() {
-        //TODO user listener
     }
 
     fun changeGroup(newGroupId: String, onComplete: (isSuccessful:Boolean, message: String) -> Unit) {
@@ -140,28 +160,14 @@ object FirestoreUtil {
             onComplete(false, "Вы не состоите в группе")
             return
         }
-        getCurrentUser {user: User ->
-            if(user.groupId != null && user.groupId != "")
-                firestoreInstance.collection("groups").document("${user.groupId}")
-                        .collection("members").document(FirebaseAuth.getInstance().currentUser?.uid.toString()).delete()
-
-            val newGroupRef = firestoreInstance.collection("groups").document(newGroupId)
-            newGroupRef.get().addOnCompleteListener {
+        firestoreInstance.collection("groups")
+            .document(newGroupId).get().addOnCompleteListener {
                 if(it.isSuccessful && it.getResult()?.exists() ?: false) {
-                    updateCurrentUserData(user.name, user.profilePicturePath, newGroupId)
-                    val curMemberRef = newGroupRef.collection("members").document(FirebaseAuth.getInstance().currentUser?.uid.toString())
-
-                    curMemberRef.set(User(user.name, user.profilePicturePath, user.registrationTokens, newGroupId))
-                            .addOnCompleteListener() {
-                                if(it.isSuccessful)
-                                    updateCurrentUserData(user.name, user.profilePicturePath, newGroupId)
-                                onComplete(it.isSuccessful, it.exception?.message ?: "")
-                            }
+                    updateCurrentUserData(groupId = newGroupId)
                 } else {
                     onComplete(false, "Группы с заданным номером не существует")
                 }
             }
-        }
     }
 
     fun sendNews(news: News, onComplete: (isSuccessful: Boolean, message: String) -> Unit) {

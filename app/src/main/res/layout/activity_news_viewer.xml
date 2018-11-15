@@ -6,10 +6,42 @@
     android:layout_height="match_parent"
     tools:context=".NewsViewerActivity">
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/editFab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:clickable="true"
+        android:onClick="onClick"
+        app:fabCustomSize="50dp"
+        app:fabSize="normal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@android:drawable/ic_menu_edit" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/backFab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="16dp"
+        android:clickable="true"
+        android:onClick="onClick"
+        app:fabCustomSize="38dp"
+        app:fabSize="mini"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/editFab"
+        app:srcCompat="@drawable/icon_back" />
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:fillViewport="true">
+        android:fillViewport="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
@@ -33,7 +65,59 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:srcCompat="@tools:sample/backgrounds/scenic[0]" />
+                    tools:srcCompat="@tools:sample/backgrounds/scenic[0]"
+                    android:onClick="onClick"
+                    android:scaleType="center"/>
+
+                <android.support.v7.widget.CardView
+                    android:id="@+id/cardView2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardBackgroundColor="@color/background">
+
+                    <android.support.constraint.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <ImageView
+                            android:id="@+id/imageView2"
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:srcCompat="@android:color/white" />
+
+                        <de.hdodenhof.circleimageview.CircleImageView
+                            android:id="@+id/authorAvatarIV"
+                            android:layout_width="64dp"
+                            android:layout_height="64dp"
+                            android:layout_weight="1"
+                            android:src="@android:color/white"
+                            app:civ_border_color="@android:color/transparent"
+                            app:civ_border_width="2dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/imageView2" />
+
+                        <TextView
+                            android:id="@+id/authorTV"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginBottom="8dp"
+                            android:fontFamily="sans-serif-condensed"
+                            android:text="Автор: Неизвестен"
+                            android:textColor="@color/alternative"
+                            android:textSize="30sp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/authorAvatarIV"
+                            app:layout_constraintTop_toTopOf="parent" />
+                    </android.support.constraint.ConstraintLayout>
+
+                </android.support.v7.widget.CardView>
 
                 <android.support.v7.widget.CardView
                     android:id="@+id/cardView1"
@@ -48,33 +132,13 @@
                         app:srcCompat="@android:color/white" />
 
                     <TextView
-                        android:id="@+id/HeaderTV"
+                        android:id="@+id/tittleTV"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:fontFamily="sans-serif-condensed"
-                        android:text="Расписание 6307"
+                        android:text="Название новости"
+                        android:textColor="@color/alternative"
                         android:textSize="30sp" />
-                </android.support.v7.widget.CardView>
-
-                <android.support.v7.widget.CardView
-                    android:id="@+id/newsCardView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:cardBackgroundColor="@color/background">
-
-                    <ImageView
-                        android:id="@+id/imageView5"
-                        android:layout_width="match_parent"
-                        android:layout_height="2dp"
-                        app:srcCompat="@android:color/white" />
-
-                    <TextView
-                        android:id="@+id/dateTV"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:fontFamily="sans-serif-condensed"
-                        android:text="29.10.2018"
-                        android:textSize="24sp" />
                 </android.support.v7.widget.CardView>
 
                 <android.support.v7.widget.CardView
@@ -90,27 +154,17 @@
                         app:srcCompat="@android:color/white" />
 
                     <TextView
-                        android:id="@+id/mainTextTV"
+                        android:id="@+id/textTV"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:fontFamily="sans-serif-condensed"
-                        android:text="Здесь может содержаться расписание.Любой другой текст.\n\nНапример такой: Уи́льям Шекспи́р (англ. William Shakespeare[2]; 26 апреля 1564 года (крещение), Стратфорд-апон-Эйвон, Англия — 23 апреля (3 мая) 1616, там же) — английский поэт и драматург, зачастую считается величайшим англоязычным писателем и одним из лучших драматургов мира[3]."
+                        android:text="Текст новости"
+                        android:textColor="@color/alternative"
                         android:textSize="24sp" />
                 </android.support.v7.widget.CardView>
 
             </LinearLayout>
 
-            <android.support.design.widget.FloatingActionButton
-                android:id="@+id/backFab"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:clickable="true"
-                app:fabSize="mini"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/icon_back" />
         </android.support.constraint.ConstraintLayout>
     </ScrollView>
 

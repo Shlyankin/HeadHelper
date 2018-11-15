@@ -50,22 +50,21 @@ class MainActivity : AppCompatActivity() {
         viewPager.adapter = mainViewPagerAdapter(fragmentsArray, supportFragmentManager)
         navigation.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener)
 
-        prevItemMenu = navigation.menu.getItem(0)
+        prevItemMenu = navigation.menu.getItem(1)
+        prevItemMenu.isChecked = true
+        viewPager.currentItem = 1
+
 
         viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
-            override fun onPageScrolled(p0: Int, p1: Float, p2: Int) {
-
-            }
+            override fun onPageScrolled(p0: Int, p1: Float, p2: Int) {}
 
             override fun onPageSelected(position: Int) {
-                navigation.menu.getItem(0).isChecked = false
+                prevItemMenu.isChecked = false
                 navigation.menu.getItem(position).isChecked = true
                 prevItemMenu = navigation.menu.getItem(position)
             }
 
-            override fun onPageScrollStateChanged(position: Int) {
-
-            }
+            override fun onPageScrollStateChanged(position: Int) {}
         })
         checkGroup()
     }

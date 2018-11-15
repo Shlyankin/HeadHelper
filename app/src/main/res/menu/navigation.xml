@@ -4,7 +4,7 @@
     <item
         android:id="@+id/navigation_chat"
         android:icon="@drawable/icon_chat"
-        android:title="@string/title_home"/>
+        android:title="@string/title_chat"/>
 
     <item
         android:id="@+id/navigation_news"
@@ -14,5 +14,5 @@
     <item
         android:id="@+id/navigation_cabinet"
         android:icon="@drawable/icon_user"
-        android:title="@string/title_notifications"/>
+        android:title="@string/title_cabinet"/>
 </menu>

@@ -77,19 +77,6 @@ object CustomImageManager {
         }
     }
 
-    //не используется и не работает
-    /*
-    fun getRealPathFromURI(activity: Activity, uri: Uri): String {
-        val projection = arrayOf<String>(MediaStore.Images.Media.DATA)
-        val cursor = activity.contentResolver.
-                query(uri, projection, null, null, null) //return null??
-
-        val columnIndex = cursor
-                .getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
-        cursor.moveToFirst()
-        return cursor.getString(columnIndex)
-    }*/
-
     private fun createTempImageFile(storageDir: File?): File {
         // Генерируем имя файла по текущему времени
         val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())

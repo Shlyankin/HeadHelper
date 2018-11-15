@@ -1,8 +1,6 @@
 package com.heads.thinking.headhelper
 
 import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModel
-import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
@@ -17,8 +15,6 @@ import android.widget.Toast
 import com.heads.thinking.headhelper.adapters.NewsRecyclerAdapter
 import com.heads.thinking.headhelper.models.News
 import com.heads.thinking.headhelper.mvvm.NewsViewModel
-import com.heads.thinking.headhelper.util.FirestoreUtil
-import org.jetbrains.anko.support.v4.act
 
 class NewsFragment : Fragment(), View.OnClickListener {
 
@@ -46,7 +42,7 @@ class NewsFragment : Fragment(), View.OnClickListener {
         val view = inflater.inflate(R.layout.fragment_news, container, false)
 
         newsRecyclerView = view.findViewById(R.id.newsRecyclerView)
-        newsRecyclerView.layoutManager = LinearLayoutManager(App.instance?.applicationContext, LinearLayoutManager.HORIZONTAL, false)
+        newsRecyclerView.layoutManager = LinearLayoutManager(App.instance?.applicationContext, LinearLayoutManager.VERTICAL, false)
         newsRecyclerView.hasFixedSize()
         adapterNewsRecyclerAdapter = NewsRecyclerAdapter(this.context!!, ArrayList<News>())
         newsRecyclerView.adapter = adapterNewsRecyclerAdapter
@@ -66,23 +62,6 @@ class NewsFragment : Fragment(), View.OnClickListener {
                         Toast.LENGTH_SHORT).show()
             }
         })
-
-        /*FirestoreUtil.getNews { isSuccessful: Boolean, arrayList: ArrayList<News>? ->
-            if(isSuccessful) {
-                newsList = arrayList!!
-                newsRecyclerView.layoutManager = LinearLayoutManager(App.instance?.applicationContext, LinearLayoutManager.HORIZONTAL, false)
-                newsRecyclerView.hasFixedSize()
-                if (context != null) {
-                    adapterNewsRecyclerAdapter = NewsRecyclerAdapter(activity!!, newsList)
-                    newsRecyclerView.adapter = adapterNewsRecyclerAdapter
-                    listReady = true
-                }
-            } else {
-                Toast.makeText(App.instance!!.applicationContext,
-                        "Не получилось обновить новости.\nПроверьте состоите ли вы в группе в своем кабинете",
-                        Toast.LENGTH_SHORT).show()
-            }
-        }*/
         return view
     }
 }

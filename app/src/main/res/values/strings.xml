@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">HeadHelper</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_chat">Чат</string>
+    <string name="title_dashboard">Новости</string>
+    <string name="title_cabinet">Кабинет</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
