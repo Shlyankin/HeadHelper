@@ -4,6 +4,7 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import android.widget.Toast
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.QueryDocumentSnapshot
 import com.google.firebase.firestore.QuerySnapshot
 import com.heads.thinking.headhelper.App
@@ -12,21 +13,45 @@ import com.heads.thinking.headhelper.util.FirestoreUtil
 
 class NewsViewModel: ViewModel() {
 
-    var news : MutableLiveData<ArrayList<News>>? = null
+    var newsListener: ListenerRegistration? = null
+    var groupId: String? = null
+    var news : MutableLiveData<ArrayList<News>> = MutableLiveData<ArrayList<News>>()
+
+    fun getListener(): LiveData<ListenerRegistration?> {
+        return MutableLiveData<ListenerRegistration?>().apply {
+            postValue(newsListener)
+        }
+    }
 
     fun getNews(): LiveData<ArrayList<News>> {
-        if(news == null) {
-            news = MutableLiveData<ArrayList<News>>()
-            news!!.postValue(ArrayList<News>())
-            FirestoreUtil.addNewsListener { isSuccessful, message, querySnapshot, firebaseFirestoreException ->
+        FirestoreUtil.getCurrentUser {
+            if(it.groupId != groupId) {
+                removeListener()
+                addListener()
+            }
+        }
+        return news
+    }
+
+    fun removeListener() {
+        if(newsListener != null)
+            FirestoreUtil.removeListener(newsListener!!)
+    }
+
+    fun addListener() {
+        news.postValue(ArrayList<News>())
+        FirestoreUtil.addNewsListener(
+            {
+                newsListener = it
+            },
+            { isSuccessful, message,  groupId, querySnapshot, firebaseFirestoreException ->
                 if (isSuccessful && !(querySnapshot?.isEmpty ?: true)) {
                     news!!.postValue(toListNews(querySnapshot!!))
                 } else {
                     Toast.makeText(App.instance?.applicationContext, message, Toast.LENGTH_SHORT).show() //TODO Надо ли это делать?
                 }
             }
-        }
-        return news as MutableLiveData<ArrayList<News>>
+        )
     }
 
     private fun toListNews(querySnapshot: QuerySnapshot) : ArrayList<News> {

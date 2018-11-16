@@ -53,7 +53,11 @@ class CabinetFragment : Fragment(), View.OnClickListener {
         changeGroupBtn.setOnClickListener(this)
         changePasswordBtn.setOnClickListener(this)
         signOutBtn.setOnClickListener(this)
+        return view
+    }
 
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
         val userViewModel : UserViewModel = ViewModelProviders.of(this).get(UserViewModel::class.java)
         userViewModel.getUser().observe(this.activity!!, object : Observer<User> {
 
@@ -62,7 +66,7 @@ class CabinetFragment : Fragment(), View.OnClickListener {
                     user = changedUser
                     usersNameTV.text = changedUser.name
                     groupIdTV.text = changedUser.groupId ?: ""
-                    if (changedUser.profilePicturePath != null)
+                    if (changedUser.profilePicturePath != null && this@CabinetFragment.activity != null)
                         GlideApp.with(this@CabinetFragment)
                                 .load(StorageUtil.pathToReference(changedUser.profilePicturePath))
                                 .into(avatarIV)
@@ -70,7 +74,6 @@ class CabinetFragment : Fragment(), View.OnClickListener {
             }
 
         })
-        return view
     }
 
     override fun onClick(view: View?) {

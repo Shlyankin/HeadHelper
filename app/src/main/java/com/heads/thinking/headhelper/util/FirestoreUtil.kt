@@ -11,6 +11,11 @@ object FirestoreUtil {
     private var groupReference: DocumentReference? = null
     private var currentUser: User? = null
 
+    fun userSignOut() {
+        groupReference = null
+        currentUser = null
+    }
+
     private val currentUserDocRef: DocumentReference
         get() = firestoreInstance.document("users/${FirebaseAuth.getInstance().currentUser?.uid
                 ?: throw NullPointerException("UID is null.")}")
@@ -34,6 +39,7 @@ object FirestoreUtil {
         }
     }
 
+    // переделать
     fun getMembers(onComplete: (isSuccessful: Boolean, message: String,  members: ArrayList<User>?) -> Unit) {
         getCurrentUser {
             if(it.groupId != null) {
@@ -132,12 +138,10 @@ object FirestoreUtil {
                 .collection("members").document(FirebaseAuth.getInstance().currentUser?.uid.toString())
                     .set(mapOf(Pair("memberRef",
                             FirebaseAuth.getInstance().currentUser?.uid.toString())))
-                .addOnCompleteListener {
-                    updateGroupRef()
-                }
         }
-        currentUserDocRef.update(userFieldMap)
-        getUpdatedCurrentUser { user: User -> } // update user object
+        currentUserDocRef.update(userFieldMap).addOnSuccessListener {
+            updateGroupRef()
+        }
     }
 
     fun createGroup(newGroupId: String, onComplete: (isSuccessful: Boolean, message: String) -> Unit) {
@@ -148,9 +152,10 @@ object FirestoreUtil {
         firestoreInstance.collection("groups").document(newGroupId).get()
             .addOnCompleteListener {
                 if(it.isSuccessful && it.getResult()?.exists() ?: false) {
-                onComplete(false, "Группа с данынм ID существует")
+                    onComplete(false, "Группа с данынм ID существует")
                 } else {
                     updateCurrentUserData(groupId = newGroupId)
+                    onComplete(true, "Группа создана выполнена")
                 }
             }
     }
@@ -164,6 +169,7 @@ object FirestoreUtil {
             .document(newGroupId).get().addOnCompleteListener {
                 if(it.isSuccessful && it.getResult()?.exists() ?: false) {
                     updateCurrentUserData(groupId = newGroupId)
+                    onComplete(true, "Вы сменили группу")
                 } else {
                     onComplete(false, "Группы с заданным номером не существует")
                 }
@@ -198,30 +204,33 @@ object FirestoreUtil {
         }
     }
 
-    fun addNewsListener(onChange: (isSuccessful: Boolean, message: String, querySnapshot: QuerySnapshot?,
+    fun addNewsListener(onCreateListener: (listener: ListenerRegistration?) -> Unit,
+                        onChange: (isSuccessful: Boolean, message: String, groupId: String?, querySnapshot: QuerySnapshot?,
                                    firebaseFirestoreException: FirebaseFirestoreException?) -> Unit) {
         groupRef{ isSuccessful: Boolean, documentReference: DocumentReference? ->
             if(isSuccessful) {
-                documentReference!!.collection("news").addSnapshotListener{
-                    querySnapshot: QuerySnapshot?, firebaseFirestoreException: FirebaseFirestoreException? ->
-                    onChange(isSuccessful, "", querySnapshot, firebaseFirestoreException)
+                getCurrentUser {
+                    onCreateListener(
+                            documentReference!!.collection("news").addSnapshotListener { querySnapshot: QuerySnapshot?, firebaseFirestoreException: FirebaseFirestoreException? ->
+                                onChange(isSuccessful, "", it.groupId, querySnapshot, firebaseFirestoreException)
+                            }
+                    )
                 }
-            }
-            else {
-                onChange(isSuccessful, "Не могу загрузить новости.\nПроверьте состоите ли вы в гурппе", null, null)
+            } else {
+                onCreateListener(null)
+                onChange(isSuccessful, "Не могу загрузить новости.\nПроверьте состоите ли вы в гурппе",
+                        null, null, null)
             }
         }
     }
+
+    fun removeListener(registration: ListenerRegistration) = registration.remove()
 
     fun sendMessage() {
         //TODO
     }
 
     fun addChatMessagesListener() {
-        //TODO
-    }
-
-    fun removeListener() {
         //TODO
     }
 }

@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".CabinetFragment"
-    android:layout_marginBottom="10dp">
+    tools:context=".CabinetFragment">
 
 
     <ScrollView
@@ -54,6 +53,7 @@
                         android:layout_marginTop="8dp"
                         android:adjustViewBounds="true"
                         android:maxHeight="300dp"
+                        android:scaleType="centerCrop"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHorizontal_bias="0.0"
                         app:layout_constraintStart_toStartOf="parent"
@@ -114,9 +114,11 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="32dp"
                 android:layout_marginEnd="8dp"
+                android:layout_marginBottom="16dp"
                 app:cardCornerRadius="30dp"
                 app:cardElevation="5dp"
                 app:contentPadding="15dp"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/profileCardView">
