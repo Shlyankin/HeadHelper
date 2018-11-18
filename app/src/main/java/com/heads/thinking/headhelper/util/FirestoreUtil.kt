@@ -1,5 +1,6 @@
 package com.heads.thinking.headhelper.util
 
+import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.*
 import com.heads.thinking.headhelper.models.News
@@ -154,9 +155,16 @@ object FirestoreUtil {
                 if(it.isSuccessful && it.getResult()?.exists() ?: false) {
                     onComplete(false, "Группа с данынм ID существует")
                 } else {
-                    updateCurrentUserData(groupId = newGroupId)
-                    onComplete(true, "Группа создана выполнена")
+                    if(it.exception is FirebaseNetworkException) {
+                        onComplete(false, "Отсутствует подключение к интрнету")
+                    } else {
+                        updateCurrentUserData(groupId = newGroupId)
+                        onComplete(true, "Группа создана")
+                    }
                 }
+            }
+            .addOnFailureListener {
+                onComplete(false, it.message ?: "")
             }
     }
 
@@ -171,8 +179,14 @@ object FirestoreUtil {
                     updateCurrentUserData(groupId = newGroupId)
                     onComplete(true, "Вы сменили группу")
                 } else {
-                    onComplete(false, "Группы с заданным номером не существует")
+                    if(it.exception?.message == "Failed to get document because the client is offline.") {
+                        onComplete(false, "Отсутствует подключение к интрнету")
+                    } else
+                        onComplete(false, "Группы с заданным номером не существует")
                 }
+            }
+            .addOnFailureListener {
+                onComplete(false, it.message ?: "")
             }
     }
 
@@ -203,6 +217,8 @@ object FirestoreUtil {
             }
         }
     }
+
+
 
     fun addNewsListener(onCreateListener: (listener: ListenerRegistration?) -> Unit,
                         onChange: (isSuccessful: Boolean, message: String, groupId: String?, querySnapshot: QuerySnapshot?,

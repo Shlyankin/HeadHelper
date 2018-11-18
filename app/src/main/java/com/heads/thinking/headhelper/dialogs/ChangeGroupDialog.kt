@@ -39,13 +39,13 @@ class ChangeGroupDialog: DialogFragment() {
 
         builder.setTitle("Смена группы")
         builder.setPositiveButton("Вступить в группу", { dialogInterface: DialogInterface, i: Int ->
-            val dialog = indeterminateProgressDialog("Меняем группу")
+            val dialog = indeterminateProgressDialog("Меняем группу") // создаю диалоговое окно
             dialog.setCancelable(false)
             dialog.setCanceledOnTouchOutside(false)
                 FirestoreUtil.changeGroup(idGroupET.text.toString(), { isSuccessful: Boolean, message: String ->
                     object : CountDownTimer(1500, 1000) {
                         override fun onFinish() {
-                            if(dialog.ownerActivity != null)
+                            //TODO проверка
                                 dialog.dismiss()
                         }
                         override fun onTick(p0: Long) {}
@@ -53,7 +53,7 @@ class ChangeGroupDialog: DialogFragment() {
                     if(isSuccessful)
                         Toast.makeText(App.instance, "Вы сменили группу", Toast.LENGTH_SHORT).show()
                     else
-                        Toast.makeText(App.instance, "Не получилось сменить группу", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(App.instance, "Не получилось сменить группу\n" + message, Toast.LENGTH_SHORT).show()
                 })
                 })
                 .setNeutralButton("Создать группу", { dialogInterface: DialogInterface, i: Int ->
@@ -63,7 +63,7 @@ class ChangeGroupDialog: DialogFragment() {
                     FirestoreUtil.createGroup(idGroupET.text.toString()) { isSuccessful: Boolean, message: String ->
                         object : CountDownTimer(2000, 1000) {
                             override fun onFinish() {
-                                if(dialog.ownerActivity != null)
+                                //TODO проверка
                                     dialog.dismiss()
                             }
                             override fun onTick(p0: Long) {}
@@ -71,7 +71,7 @@ class ChangeGroupDialog: DialogFragment() {
                         if(isSuccessful)
                             Toast.makeText(App.instance, "Вы создали группу", Toast.LENGTH_SHORT).show()
                         else
-                            Toast.makeText(App.instance, "Не получилось создать группу", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(App.instance, "Не получилось создать группу\n" + message, Toast.LENGTH_SHORT).show()
                     }
                 })
                 .setNegativeButton("Отмена", null)

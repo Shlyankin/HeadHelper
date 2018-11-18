@@ -1,6 +1,6 @@
 package com.heads.thinking.headhelper
 
-import android.arch.lifecycle.ViewModel
+import com.heads.thinking.headhelper.mvvm.MainActivityViewModel
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
@@ -11,13 +11,9 @@ import android.view.MenuItem
 import android.widget.Toast
 import com.heads.thinking.headhelper.util.FirestoreUtil
 
-class MainActivtiyViewModel : ViewModel() {
-    var selectedMenusId : Int = R.id.navigation_news
-}
-
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var userViewModel : MainActivtiyViewModel
+    private lateinit var userViewModel : MainActivityViewModel
     private lateinit var prevItemMenu: MenuItem
     private lateinit var viewPager: ViewPager
     private lateinit var navigation: BottomNavigationView
@@ -32,7 +28,7 @@ class MainActivity : AppCompatActivity() {
             }
             R.id.navigation_news -> {
                 userViewModel.selectedMenusId = R.id.navigation_news
-loadFragment(NewsFragment())
+                loadFragment(NewsFragment())
             }
             R.id.navigation_cabinet -> {
                 userViewModel.selectedMenusId = R.id.navigation_cabinet
@@ -59,7 +55,7 @@ loadFragment(NewsFragment())
         setContentView(R.layout.activity_main)
         navigation = findViewById(R.id.navigation)
         navigation.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener)
-        userViewModel = ViewModelProviders.of(this).get(MainActivtiyViewModel::class.java)
+        userViewModel = ViewModelProviders.of(this).get(MainActivityViewModel::class.java)
         navigation.selectedItemId = userViewModel.selectedMenusId
         checkGroup()
     }
