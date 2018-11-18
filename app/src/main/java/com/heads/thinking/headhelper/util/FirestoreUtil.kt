@@ -202,6 +202,23 @@ object FirestoreUtil {
         }
     }
 
+    fun deleteNews(id: String, onComplete: (isSuccessful: Boolean) -> Unit) {
+        groupRef { isSuccessful, documentReference ->
+            if(isSuccessful) {
+                documentReference!!.collection("news").document(id).delete()
+                        .addOnCompleteListener() {
+                            if(it.isSuccessful) {
+                                onComplete(true)
+                            } else {
+                                onComplete(false)
+                            }
+                        }
+            } else {
+                onComplete(false)
+            }
+        }
+    }
+
     fun getNews(onComplete: (isSuccessful: Boolean, news: ArrayList<News>?) -> Unit){
         groupRef { isSuccessful, documentReference ->
             if(isSuccessful) {

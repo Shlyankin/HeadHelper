@@ -10,15 +10,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import com.google.firebase.storage.FirebaseStorage
+import com.heads.thinking.headhelper.App
 import com.heads.thinking.headhelper.NewsViewerActivity
 import com.heads.thinking.headhelper.R
 import com.heads.thinking.headhelper.glide.GlideApp
 import com.heads.thinking.headhelper.models.News
+import com.heads.thinking.headhelper.mvvm.NewsViewModel
 import com.heads.thinking.headhelper.util.FirestoreUtil
 import com.heads.thinking.headhelper.util.StorageUtil
 
-class NewsRecyclerAdapter(val context: Context, var list:List<News>): RecyclerView.Adapter<NewsRecyclerAdapter.ViewHolder>() {
+class NewsRecyclerAdapter(val context: Context, var list:ArrayList<News>, val newsViewModel: NewsViewModel): RecyclerView.Adapter<NewsRecyclerAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, p1: Int): ViewHolder {
         val viewHolder = LayoutInflater.from(parent.context).inflate(R.layout.item_news_recycler_view, parent, false)
@@ -28,11 +31,18 @@ class NewsRecyclerAdapter(val context: Context, var list:List<News>): RecyclerVi
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
         viewHolder.bindItems(list[position])
         viewHolder.deleteBtn.setOnClickListener {
-            /*
-            //TODO delete news
-            if(list[position].picturePath != null)
-                StorageUtil.deleteNewsImage(list[position].picturePath!!, {})
-            */
+            val deletingNews : News = list[position]
+            FirestoreUtil.deleteNews(deletingNews.id, {
+                if(it) {
+                    Toast.makeText(App.instance, "Новость удалена", Toast.LENGTH_SHORT).show()
+                    if(list.size == 1)
+                        newsViewModel.updateListener()
+                    if(deletingNews.picturePath != null)
+                        StorageUtil.deleteNewsImage(deletingNews.picturePath!!, {})
+                }
+                else
+                    Toast.makeText(App.instance, "Не получилось удалить", Toast.LENGTH_SHORT).show()
+            })
         }
         viewHolder.newsCardView.setOnClickListener {
             context.startActivity(Intent(context, NewsViewerActivity::class.java).apply {

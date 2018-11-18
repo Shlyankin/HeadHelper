@@ -46,20 +46,21 @@ class NewsFragment : Fragment(), View.OnClickListener {
                               savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_news, container, false)
 
+        newsViewModel = ViewModelProviders.of(this).get(NewsViewModel::class.java)
+
         newsRecyclerView = view.findViewById(R.id.newsRecyclerView)
         newsRecyclerView.layoutManager = LinearLayoutManager(App.instance?.applicationContext, LinearLayoutManager.VERTICAL, false)
         newsRecyclerView.hasFixedSize()
-        adapterNewsRecyclerAdapter = NewsRecyclerAdapter(this.context!!, ArrayList<News>())
+        adapterNewsRecyclerAdapter = NewsRecyclerAdapter(this.context!!, ArrayList<News>(), newsViewModel)
         newsRecyclerView.adapter = adapterNewsRecyclerAdapter
         addNewsBtn = view.findViewById(R.id.addNewsFab)
         addNewsBtn.setOnClickListener(this)
 
-        newsViewModel = ViewModelProviders.of(this).get(NewsViewModel::class.java)
         return view
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onStart() {
+        super.onStart()
         newsViewModel.getListener().observe(this.activity!!, Observer<ListenerRegistration?> {
             if(it == null) {
                 newsViewModel.getNews().observe(this.activity!!, Observer<ArrayList<News>> { changedNews ->

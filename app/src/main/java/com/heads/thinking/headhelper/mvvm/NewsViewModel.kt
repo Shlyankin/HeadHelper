@@ -47,8 +47,6 @@ class NewsViewModel: ViewModel() {
             { isSuccessful, message,  groupId, querySnapshot, firebaseFirestoreException ->
                 if (isSuccessful && !(querySnapshot?.isEmpty ?: true)) {
                     news!!.postValue(toListNews(querySnapshot!!))
-                } else {
-                    Toast.makeText(App.instance?.applicationContext, message, Toast.LENGTH_SHORT).show() //TODO Надо ли это делать?
                 }
             }
         )
@@ -67,5 +65,10 @@ class NewsViewModel: ViewModel() {
             news.add(examplerNews)
         }
         return news
+    }
+
+    fun updateListener() {
+        removeListener()
+        addListener()
     }
 }
