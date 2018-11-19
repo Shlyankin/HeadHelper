@@ -18,7 +18,9 @@ import android.widget.Toast
 import com.google.firebase.firestore.ListenerRegistration
 import com.heads.thinking.headhelper.adapters.NewsRecyclerAdapter
 import com.heads.thinking.headhelper.models.News
+import com.heads.thinking.headhelper.models.User
 import com.heads.thinking.headhelper.mvvm.NewsViewModel
+import com.heads.thinking.headhelper.util.FirestoreUtil
 
 class NewsFragment : Fragment(), View.OnClickListener {
 
@@ -55,26 +57,26 @@ class NewsFragment : Fragment(), View.OnClickListener {
         newsRecyclerView.adapter = adapterNewsRecyclerAdapter
         addNewsBtn = view.findViewById(R.id.addNewsFab)
         addNewsBtn.setOnClickListener(this)
-
         return view
     }
 
     override fun onStart() {
         super.onStart()
-        newsViewModel.getListener().observe(this.activity!!, Observer<ListenerRegistration?> {
-            if(it == null) {
-                newsViewModel.getNews().observe(this.activity!!, Observer<ArrayList<News>> { changedNews ->
-                    if(changedNews != null) {
-                        newsList = changedNews
-                        adapterNewsRecyclerAdapter.list = newsList
-                        adapterNewsRecyclerAdapter.notifyDataSetChanged()
-                        listReady = true
-                    } else {
-                        Toast.makeText(this.context,
-                                "Не получилось обновить новости.\nПроверьте состоите ли вы в группе в своем кабинете",
-                                Toast.LENGTH_SHORT).show()
-                    }
-                })
+        newsViewModel.getUser().observe(this.activity!!, Observer<User> {user: User? ->
+            if(user != null && user.privilege != 0) {
+                addNewsBtn.visibility = View.VISIBLE
+            }
+        })
+        newsViewModel.getNews().observe(this.activity!!, Observer<ArrayList<News>> { changedNews ->
+            if(changedNews != null) {
+                newsList = changedNews
+                adapterNewsRecyclerAdapter.list = newsList
+                adapterNewsRecyclerAdapter.notifyDataSetChanged()
+                listReady = true
+            } else {
+                Toast.makeText(this.context,
+                        "Не получилось обновить новости.\nПроверьте состоите ли вы в группе в своем кабинете",
+                        Toast.LENGTH_SHORT).show()
             }
         })
     }

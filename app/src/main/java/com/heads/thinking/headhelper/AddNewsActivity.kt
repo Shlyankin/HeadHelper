@@ -65,11 +65,12 @@ class AddNewsActivity: AppCompatActivity(), View.OnClickListener {
                     if(tittle == "") {
                         Toast.makeText(this, "Напишите заголовок, чтобы новость была более информативной", Toast.LENGTH_SHORT).show()
                     } else {
-                        FirestoreUtil.getCurrentUser {
+                        val user = FirestoreUtil.currentUser
+                        if(user != null) {
                             val newsId: String = news?.id ?: UUID.randomUUID().toString()
                             val news: News = News(id = newsId, tittle = tittle,
                                     category = "", text = textET.text.toString(),
-                                    picturePath = urlNewsImage, authorRef =  it.id)
+                                    picturePath = urlNewsImage, authorRef =  user.id)
                             FirestoreUtil.sendNews(news, { isSuccessful: Boolean, message: String ->
                                 if (isSuccessful) {
                                     Toast.makeText(App.instance!!.applicationContext, "Новость выложена", Toast.LENGTH_SHORT).show()

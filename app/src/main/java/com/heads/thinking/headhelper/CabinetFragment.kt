@@ -128,7 +128,7 @@ class CabinetFragment : Fragment(), View.OnClickListener {
             selectedImageBytes = outputStream.toByteArray()
 
             StorageUtil.uploadProfilePhoto(selectedImageBytes, { refPath: String ->
-                FirestoreUtil.updateCurrentUserData("", refPath, null)
+                FirestoreUtil.updateCurrentUserData("",null, refPath, null)
                 Toast.makeText(App.instance, "Фото загружено", Toast.LENGTH_SHORT).show()
             })
         } else {

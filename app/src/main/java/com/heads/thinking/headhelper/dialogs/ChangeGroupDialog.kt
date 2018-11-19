@@ -39,17 +39,7 @@ class ChangeGroupDialog: DialogFragment() {
 
         builder.setTitle("Смена группы")
         builder.setPositiveButton("Вступить в группу", { dialogInterface: DialogInterface, i: Int ->
-            val dialog = indeterminateProgressDialog("Меняем группу") // создаю диалоговое окно
-            dialog.setCancelable(false)
-            dialog.setCanceledOnTouchOutside(false)
                 FirestoreUtil.changeGroup(idGroupET.text.toString(), { isSuccessful: Boolean, message: String ->
-                    object : CountDownTimer(1500, 1000) {
-                        override fun onFinish() {
-                            //TODO проверка
-                                dialog.dismiss()
-                        }
-                        override fun onTick(p0: Long) {}
-                    }.start()
                     if(isSuccessful)
                         Toast.makeText(App.instance, "Вы сменили группу", Toast.LENGTH_SHORT).show()
                     else
@@ -57,17 +47,7 @@ class ChangeGroupDialog: DialogFragment() {
                 })
                 })
                 .setNeutralButton("Создать группу", { dialogInterface: DialogInterface, i: Int ->
-                    val dialog = indeterminateProgressDialog("Создаем группу")
-                    dialog.setCancelable(false)
-                    dialog.setCanceledOnTouchOutside(false)
                     FirestoreUtil.createGroup(idGroupET.text.toString()) { isSuccessful: Boolean, message: String ->
-                        object : CountDownTimer(2000, 1000) {
-                            override fun onFinish() {
-                                //TODO проверка
-                                    dialog.dismiss()
-                            }
-                            override fun onTick(p0: Long) {}
-                        }.start()
                         if(isSuccessful)
                             Toast.makeText(App.instance, "Вы создали группу", Toast.LENGTH_SHORT).show()
                         else

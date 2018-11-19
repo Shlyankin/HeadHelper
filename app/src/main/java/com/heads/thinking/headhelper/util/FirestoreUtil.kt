@@ -10,45 +10,36 @@ import com.heads.thinking.headhelper.models.User
 object FirestoreUtil {
     private val firestoreInstance: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
     private var groupReference: DocumentReference? = null
-    private var currentUser: User? = null
-
-    fun userSignOut() {
-        groupReference = null
-        currentUser = null
-    }
+    var currentUser: User? = null
 
     private val currentUserDocRef: DocumentReference
         get() = firestoreInstance.document("users/${FirebaseAuth.getInstance().currentUser?.uid
                 ?: throw NullPointerException("UID is null.")}")
 
-    private fun getUpdatedCurrentUser(onComplete: (User) -> Unit) {
-        currentUserDocRef.get()
-                .addOnSuccessListener {
-                    currentUser = it.toObject(User::class.java)!!
-                    onComplete(currentUser!!)
-                }
+    var useListener: ListenerRegistration = currentUserDocRef.addSnapshotListener {
+        documentSnapshot: DocumentSnapshot?, firebaseFirestoreException: FirebaseFirestoreException? ->
+        if(firebaseFirestoreException == null && documentSnapshot?.exists() ?: false) {
+            currentUser = documentSnapshot!!.toObject(User::class.java)
+            if(currentUser?.groupId != null)
+                groupReference = firestoreInstance.collection("groups").document(currentUser?.groupId!!)
+        }
     }
 
-    fun getCurrentUser(onComplete: (user: User) -> Unit) {
-        if(currentUser == null) {
-            getUpdatedCurrentUser {
-                currentUser = it
-                onComplete(currentUser!!)
-            }
-        } else {
-            onComplete(currentUser!!)
-        }
+    fun userSignOut() {
+        removeListener(useListener)
+        groupReference = null
+        currentUser = null
     }
 
     // переделать
     fun getMembers(onComplete: (isSuccessful: Boolean, message: String,  members: ArrayList<User>?) -> Unit) {
-        getCurrentUser {
-            if(it.groupId != null) {
-                firestoreInstance.collection("groups").document(it.groupId).collection("members").get()
+        if(currentUser != null) {
+            if (currentUser?.groupId != null) {
+                firestoreInstance.collection("groups").document(currentUser?.groupId ?: "").collection("members").get()
                         .addOnSuccessListener {
-                            if(!it.isEmpty) {
+                            if (!it.isEmpty) {
                                 val list: ArrayList<User> = ArrayList()
-                                for(document in it) {
+                                for (document in it) {
                                     list.add(document.toObject(User::class.java))
                                 }
                                 onComplete(true, "", list)
@@ -60,6 +51,7 @@ object FirestoreUtil {
         }
     }
 
+    //получить любого пользователя по ссылке
     fun getUser(userPath: String, onComplete: (isSuccessful: Boolean, user: User?) -> Unit) {
         firestoreInstance.collection("users").document(userPath).get()
                 .addOnSuccessListener {
@@ -83,33 +75,11 @@ object FirestoreUtil {
         }
     }
 
-    private fun updateGroupRef() {
-        getUpdatedCurrentUser {
-            if(it.groupId != null)
-                groupReference = firestoreInstance.collection("groups").document(it.groupId)
-        }
-    }
-
-    private fun groupRef(onComplete: (isSuccessful: Boolean, initilGroupRef: DocumentReference?) -> Unit) {
-        if(groupReference == null)
-            getUpdatedCurrentUser {
-                if(it.groupId != null && it.groupId != "") {
-                    groupReference = firestoreInstance.collection("groups").document(it.groupId)
-                    onComplete(true, groupReference)
-                } else {
-                    onComplete(false, null)
-                }
-            }
-        else
-            onComplete(true, groupReference)
-    }
-
-
     fun initCurrentUserIfFirstTime(onComplete: () -> Unit) {
         currentUserDocRef.get().addOnSuccessListener { documentSnapshot ->
             if (!documentSnapshot.exists()) {
                 val newUser = User(FirebaseAuth.getInstance().currentUser?.uid.toString(), FirebaseAuth.getInstance().currentUser?.displayName ?: "",
-                        null, mutableListOf(), null)
+                        0, null, mutableListOf(), null)
                 currentUserDocRef.set(newUser).addOnSuccessListener {
                     onComplete()
                 }
@@ -119,18 +89,17 @@ object FirestoreUtil {
         }
     }
 
-    fun updateCurrentUserData(name: String = "", profilePicturePath: String? = null, groupId: String?) {
+    fun updateCurrentUserData(name: String = "", privilege: Int? = null, profilePicturePath: String? = null, groupId: String?) {
         val userFieldMap = mutableMapOf<String, Any>()
         if (name.isNotBlank()) userFieldMap["name"] = name
+        if (privilege != null) userFieldMap["privilege"] = privilege
         if (profilePicturePath != null)
             userFieldMap["profilePicturePath"] = profilePicturePath
         if (groupId != null) {
-            getCurrentUser { user: User ->
-                if (user.groupId != null && user.groupId != "")
+                if (currentUser!!.groupId != null && currentUser!!.groupId != "")
                     firestoreInstance.collection("groups")
-                            .document("${user.groupId}").collection("members")
+                            .document("${currentUser!!.groupId}").collection("members")
                             .document(FirebaseAuth.getInstance().currentUser?.uid.toString()).delete()
-            }
             userFieldMap["groupId"] = groupId
             val member = mutableMapOf<String, Any>()
             member [FirebaseAuth.getInstance().currentUser?.uid
@@ -140,9 +109,7 @@ object FirestoreUtil {
                     .set(mapOf(Pair("memberRef",
                             FirebaseAuth.getInstance().currentUser?.uid.toString())))
         }
-        currentUserDocRef.update(userFieldMap).addOnSuccessListener {
-            updateGroupRef()
-        }
+        currentUserDocRef.update(userFieldMap)
     }
 
     fun createGroup(newGroupId: String, onComplete: (isSuccessful: Boolean, message: String) -> Unit) {
@@ -158,7 +125,7 @@ object FirestoreUtil {
                     if(it.exception is FirebaseNetworkException) {
                         onComplete(false, "Отсутствует подключение к интрнету")
                     } else {
-                        updateCurrentUserData(groupId = newGroupId)
+                        updateCurrentUserData(privilege = 1, groupId = newGroupId)
                         onComplete(true, "Группа создана")
                     }
                 }
@@ -176,7 +143,7 @@ object FirestoreUtil {
         firestoreInstance.collection("groups")
             .document(newGroupId).get().addOnCompleteListener {
                 if(it.isSuccessful && it.getResult()?.exists() ?: false) {
-                    updateCurrentUserData(groupId = newGroupId)
+                    updateCurrentUserData(privilege = 0, groupId = newGroupId)
                     onComplete(true, "Вы сменили группу")
                 } else {
                     if(it.exception?.message == "Failed to get document because the client is offline.") {
@@ -191,21 +158,18 @@ object FirestoreUtil {
     }
 
     fun sendNews(news: News, onComplete: (isSuccessful: Boolean, message: String) -> Unit) {
-        groupRef { isSuccessful, documentReference ->
-            if(isSuccessful) {
-                documentReference!!.collection("news").document(news.id).set(news).addOnCompleteListener{
-                    onComplete(it.isSuccessful, it.exception?.message ?: "")
-                }
-            } else {
-                onComplete(false,"Не получается выполнить операцию\nПроверьте состоите ли вы в группе.")
+        val documentReference = groupReference
+        if(documentReference != null)
+            documentReference.collection("news").document(news.id).set(news).addOnCompleteListener {
+                onComplete(it.isSuccessful, it.exception?.message ?: "")
             }
-        }
+        else onComplete(false, "Проверьте состоите ли вы в группе")
     }
 
     fun deleteNews(id: String, onComplete: (isSuccessful: Boolean) -> Unit) {
-        groupRef { isSuccessful, documentReference ->
-            if(isSuccessful) {
-                documentReference!!.collection("news").document(id).delete()
+        val documentReference = groupReference
+        if(documentReference != null) {
+                documentReference.collection("news").document(id).delete()
                         .addOnCompleteListener() {
                             if(it.isSuccessful) {
                                 onComplete(true)
@@ -213,25 +177,23 @@ object FirestoreUtil {
                                 onComplete(false)
                             }
                         }
-            } else {
-                onComplete(false)
-            }
+        } else {
+            onComplete(false)
         }
     }
 
     fun getNews(onComplete: (isSuccessful: Boolean, news: ArrayList<News>?) -> Unit){
-        groupRef { isSuccessful, documentReference ->
-            if(isSuccessful) {
-                documentReference!!.collection("news").get().addOnSuccessListener {
+        val documentReference = FirestoreUtil.groupReference
+        if(documentReference != null) {
+                documentReference.collection("news").get().addOnSuccessListener {
                     val list : ArrayList<News> = ArrayList()
                     for (i in it.documents) {
                         list.add(i.toObject(News::class.java)!!)
                     }
                     onComplete(true, list)
                 }
-            } else {
-                onComplete(false, null)
-            }
+        } else {
+            onComplete(false, null)
         }
     }
 
@@ -240,18 +202,21 @@ object FirestoreUtil {
     fun addNewsListener(onCreateListener: (listener: ListenerRegistration?) -> Unit,
                         onChange: (isSuccessful: Boolean, message: String, groupId: String?, querySnapshot: QuerySnapshot?,
                                    firebaseFirestoreException: FirebaseFirestoreException?) -> Unit) {
-        groupRef{ isSuccessful: Boolean, documentReference: DocumentReference? ->
-            if(isSuccessful) {
-                getCurrentUser {
-                    onCreateListener(
-                            documentReference!!.collection("news").addSnapshotListener { querySnapshot: QuerySnapshot?, firebaseFirestoreException: FirebaseFirestoreException? ->
-                                onChange(isSuccessful, "", it.groupId, querySnapshot, firebaseFirestoreException)
-                            }
-                    )
-                }
+        val documentReference = FirestoreUtil.groupReference
+        if(documentReference != null) {
+            val user = currentUser
+            if (user != null) {
+                onCreateListener(
+                        documentReference.collection("news").addSnapshotListener { querySnapshot: QuerySnapshot?, firebaseFirestoreException: FirebaseFirestoreException? ->
+                            if(firebaseFirestoreException == null && querySnapshot != null)
+                                onChange(true, "", user.groupId, querySnapshot, firebaseFirestoreException)
+                            else
+                                onChange(false, "Что-то пошло не так", user.groupId, querySnapshot, firebaseFirestoreException)
+                        }
+                )
             } else {
                 onCreateListener(null)
-                onChange(isSuccessful, "Не могу загрузить новости.\nПроверьте состоите ли вы в гурппе",
+                onChange(false, "Не могу загрузить новости.\nПроверьте состоите ли вы в гурппе",
                         null, null, null)
             }
         }

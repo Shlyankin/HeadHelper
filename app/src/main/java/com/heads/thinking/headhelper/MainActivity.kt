@@ -57,15 +57,15 @@ class MainActivity : AppCompatActivity() {
         navigation.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener)
         userViewModel = ViewModelProviders.of(this).get(MainActivityViewModel::class.java)
         navigation.selectedItemId = userViewModel.selectedMenusId
-        checkGroup()
+        //TODO предложить пользователю вступить в группу
+        //checkUser()
     }
 
-    private fun checkGroup() {
-        FirestoreUtil.getCurrentUser {
-            if (it.groupId == null || it.groupId == "") {
-                Toast.makeText(this,"Вы не состоите в группе\n " +
+    /*private fun checkUser() {
+        val user = FirestoreUtil.currentUser
+            if (user != null && user.groupId == null) {
+                Toast.makeText(this,"Вы не состоите в группе\n" +
                         "Зайдите в кабинет и поменяйте группе", Toast.LENGTH_SHORT).show()
             }
-        }
-    }
+    }*/
 }

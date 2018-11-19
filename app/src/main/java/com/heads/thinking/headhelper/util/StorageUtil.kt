@@ -17,27 +17,26 @@ object StorageUtil {
 
     fun uploadProfilePhoto(imageBytes: ByteArray,
                            onSuccess: (imagePath: String) -> Unit) {
-        FirestoreUtil.getCurrentUser {
-            if (it.profilePicturePath != null && it.profilePicturePath != "")
-                storageInstance.reference.child(it.profilePicturePath).delete()
-                        .addOnCompleteListener {
-                            currentUserRef.child("profilePictures").delete().addOnCompleteListener {
-                                val ref = currentUserRef.child("profilePictures/${UUID.nameUUIDFromBytes(imageBytes)}")
-                                ref.putBytes(imageBytes)
-                                        .addOnSuccessListener {
-                                            onSuccess(ref.path)
-                                        }
-                            }
+        val user = FirestoreUtil.currentUser
+        if (user?.profilePicturePath != null && user.profilePicturePath != "")
+            storageInstance.reference.child(user.profilePicturePath).delete()
+                    .addOnCompleteListener {
+                        currentUserRef.child("profilePictures").delete().addOnCompleteListener {
+                            val ref = currentUserRef.child("profilePictures/${UUID.nameUUIDFromBytes(imageBytes)}")
+                            ref.putBytes(imageBytes)
+                                    .addOnSuccessListener {
+                                        onSuccess(ref.path)
+                                    }
                         }
-            else
-                currentUserRef.child("profilePictures").delete().addOnCompleteListener {
-                    val ref = currentUserRef.child("profilePictures/${UUID.nameUUIDFromBytes(imageBytes)}")
-                    ref.putBytes(imageBytes)
-                            .addOnSuccessListener {
-                                onSuccess(ref.path)
-                            }
-                }
-        }
+                    }
+        else
+            currentUserRef.child("profilePictures").delete().addOnCompleteListener {
+                val ref = currentUserRef.child("profilePictures/${UUID.nameUUIDFromBytes(imageBytes)}")
+                ref.putBytes(imageBytes)
+                        .addOnSuccessListener {
+                            onSuccess(ref.path)
+                        }
+            }
     }
 
 
