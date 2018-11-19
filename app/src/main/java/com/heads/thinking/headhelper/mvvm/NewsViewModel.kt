@@ -9,6 +9,7 @@ import com.google.firebase.firestore.QuerySnapshot
 import com.heads.thinking.headhelper.models.News
 import com.heads.thinking.headhelper.models.User
 import com.heads.thinking.headhelper.util.FirestoreUtil
+import java.util.*
 
 class NewsViewModel: ViewModel() {
 
@@ -50,13 +51,7 @@ class NewsViewModel: ViewModel() {
     private fun toListNews(querySnapshot: QuerySnapshot) : ArrayList<News> {
         val news: ArrayList<News> = ArrayList<News>()
         for(doc: QueryDocumentSnapshot in  querySnapshot) {
-            val examplerNews: News = News( //TODO check error
-                    id = doc.get("id") as String,
-                    category    = doc.get("category") as String,
-                    picturePath = doc.get("picturePath") as String?,
-                    tittle      = doc.get("tittle") as String,
-                    text        = doc.get("text") as String,
-                    authorRef   = doc.get("authorRef") as String?)
+            val examplerNews = doc.toObject(News::class.java)
             news.add(examplerNews)
         }
         return news

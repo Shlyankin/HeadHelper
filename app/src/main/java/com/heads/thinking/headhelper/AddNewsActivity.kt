@@ -20,7 +20,7 @@ import com.heads.thinking.headhelper.util.CustomImageManager
 import com.heads.thinking.headhelper.util.FirestoreUtil
 import com.heads.thinking.headhelper.util.StorageUtil
 import java.io.ByteArrayOutputStream
-import java.util.UUID
+import java.util.*
 
 class AddNewsActivity: AppCompatActivity(), View.OnClickListener {
 
@@ -68,7 +68,7 @@ class AddNewsActivity: AppCompatActivity(), View.OnClickListener {
                         val user = FirestoreUtil.currentUser
                         if(user != null) {
                             val newsId: String = news?.id ?: UUID.randomUUID().toString()
-                            val news: News = News(id = newsId, tittle = tittle,
+                            val news: News = News(id = newsId, tittle = tittle, date = Calendar.getInstance().time,
                                     category = "", text = textET.text.toString(),
                                     picturePath = urlNewsImage, authorRef =  user.id)
                             FirestoreUtil.sendNews(news, { isSuccessful: Boolean, message: String ->

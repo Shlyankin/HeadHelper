@@ -2,10 +2,12 @@ package com.heads.thinking.headhelper.models
 
 import android.os.Parcel
 import android.os.Parcelable
+import java.util.*
 
 data class News(
         val id: String,
         val category: String,
+        val date: Date?,
         val picturePath: String?,
         val tittle: String,
         val text: String,
@@ -14,12 +16,13 @@ data class News(
     constructor(parcel: Parcel) : this(
             parcel.readString(),
             parcel.readString(),
+            null,
             parcel.readString(),
             parcel.readString(),
             parcel.readString(),
             parcel.readString()) {}
 
-    constructor(): this("", "", null, "", "", null)
+    constructor(): this("", "", null, null, "", "", null)
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(id)

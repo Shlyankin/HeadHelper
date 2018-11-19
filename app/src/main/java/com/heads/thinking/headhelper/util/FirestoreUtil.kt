@@ -207,7 +207,7 @@ object FirestoreUtil {
             val user = currentUser
             if (user != null) {
                 onCreateListener(
-                        documentReference.collection("news").addSnapshotListener { querySnapshot: QuerySnapshot?, firebaseFirestoreException: FirebaseFirestoreException? ->
+                        documentReference.collection("news").orderBy("date", Query.Direction.DESCENDING).addSnapshotListener { querySnapshot: QuerySnapshot?, firebaseFirestoreException: FirebaseFirestoreException? ->
                             if(firebaseFirestoreException == null && querySnapshot != null)
                                 onChange(true, "", user.groupId, querySnapshot, firebaseFirestoreException)
                             else

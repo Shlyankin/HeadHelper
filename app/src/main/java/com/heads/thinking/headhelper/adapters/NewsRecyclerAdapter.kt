@@ -23,6 +23,7 @@ import com.heads.thinking.headhelper.models.News
 import com.heads.thinking.headhelper.mvvm.NewsViewModel
 import com.heads.thinking.headhelper.util.FirestoreUtil
 import com.heads.thinking.headhelper.util.StorageUtil
+import java.text.SimpleDateFormat
 
 class NewsRecyclerAdapter(val context: Context, var list:ArrayList<News>, val newsViewModel: NewsViewModel): RecyclerView.Adapter<NewsRecyclerAdapter.ViewHolder>() {
 
@@ -69,14 +70,17 @@ class NewsRecyclerAdapter(val context: Context, var list:ArrayList<News>, val ne
         lateinit var newsCardView: CardView
         lateinit var imageView: ImageView
         lateinit var itemHeader: TextView
+        lateinit var dateTV: TextView
 
         fun bindItems(news: News) {
             imageView = itemView.findViewById(R.id.newsCircleImageView)
             itemHeader = itemView.findViewById(R.id.itemHeader)
             newsCardView = itemView.findViewById(R.id.newsCardView)
+            dateTV = itemView.findViewById(R.id.dateTV)
 
             //load attribute
             itemHeader.text = news.tittle
+            dateTV.text = SimpleDateFormat.getInstance().format(news.date)
             if(news.picturePath != null)
                 GlideApp.with(imageView)
                       .load(StorageUtil.pathToReference(news.picturePath))
