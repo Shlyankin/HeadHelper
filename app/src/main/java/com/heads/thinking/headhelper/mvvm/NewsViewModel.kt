@@ -72,8 +72,7 @@ class NewsViewModel: ViewModel() {
     }
 
     fun updateListener() {
-        if(newsListener != null)
-            removeNewsListener()
+        removeNewsListener()
         addNewsListener()
     }
 }
