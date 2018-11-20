@@ -4,28 +4,25 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
-import android.media.Image
 import android.support.v7.widget.CardView
 import android.support.v7.widget.RecyclerView
-import android.text.Layout
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import com.google.firebase.storage.FirebaseStorage
 import com.heads.thinking.headhelper.App
 import com.heads.thinking.headhelper.NewsViewerActivity
 import com.heads.thinking.headhelper.R
 import com.heads.thinking.headhelper.glide.GlideApp
 import com.heads.thinking.headhelper.models.News
-import com.heads.thinking.headhelper.mvvm.NewsViewModel
+import com.heads.thinking.headhelper.mvvm.DataViewModel
 import com.heads.thinking.headhelper.util.FirestoreUtil
 import com.heads.thinking.headhelper.util.StorageUtil
 import java.text.SimpleDateFormat
 
-class NewsRecyclerAdapter(val context: Context, var list:ArrayList<News>, val newsViewModel: NewsViewModel): RecyclerView.Adapter<NewsRecyclerAdapter.ViewHolder>() {
+class NewsRecyclerAdapter(val context: Context, var list:ArrayList<News>, val dataViewModel: DataViewModel): RecyclerView.Adapter<NewsRecyclerAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, p1: Int): ViewHolder {
         val viewHolder = LayoutInflater.from(parent.context).inflate(R.layout.item_news_recycler_view, parent, false)
@@ -34,6 +31,7 @@ class NewsRecyclerAdapter(val context: Context, var list:ArrayList<News>, val ne
 
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
         viewHolder.bindItems(list[position])
+        //удаление новости по продолжительному нажатию а CardView
         viewHolder.newsCardView.setOnLongClickListener {
             if (FirestoreUtil.currentUser?.privilege ?: 0 != 0) {
                 val builder: AlertDialog.Builder = AlertDialog.Builder(context)
@@ -44,7 +42,7 @@ class NewsRecyclerAdapter(val context: Context, var list:ArrayList<News>, val ne
                         if (it) {
                             Toast.makeText(App.instance, "Новость удалена", Toast.LENGTH_SHORT).show()
                             if (list.size == 1)
-                                newsViewModel.updateListener()
+                                dataViewModel.updateNewsListener()
                             if (deletingNews.picturePath != null)
                                 StorageUtil.deleteNewsImage(deletingNews.picturePath!!, {})
                         } else
@@ -56,6 +54,7 @@ class NewsRecyclerAdapter(val context: Context, var list:ArrayList<News>, val ne
             }
             true
         }
+        //открытие новости по нажатию на CardView
         viewHolder.newsCardView.setOnClickListener {
             context.startActivity(Intent(context, NewsViewerActivity::class.java).apply {
                 putExtra("news", list[position])
@@ -78,7 +77,7 @@ class NewsRecyclerAdapter(val context: Context, var list:ArrayList<News>, val ne
             newsCardView = itemView.findViewById(R.id.newsCardView)
             dateTV = itemView.findViewById(R.id.dateTV)
 
-            //load attribute
+            //заполняем атрибуты view
             itemHeader.text = news.tittle
             dateTV.text = SimpleDateFormat.getInstance().format(news.date)
             if(news.picturePath != null)

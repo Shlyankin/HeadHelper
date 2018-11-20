@@ -39,11 +39,12 @@ class AddNewsActivity: AppCompatActivity(), View.OnClickListener {
                 onBackPressed()
             }
             R.id.addImageFab -> {
-                if (uploadImageTask == null)
+                if (uploadImageTask == null) {
+                    // изображение не загружалось ранее
                     CustomImageManager.getPhotoMakerIntent(this)?.let {
                         startActivityForResult(it, CustomImageManager.REQUEST_CODE_TAKE_PHOTO)
                     }
-                else if(uploadImageTask!!.isComplete) {
+                } else if(uploadImageTask!!.isComplete) {
                     // изображение уже загружено и его надо удалить
                     StorageUtil.deleteNewsImage(urlNewsImage!!, {})
                     CustomImageManager.getPhotoMakerIntent(this)?.let {
@@ -112,12 +113,12 @@ class AddNewsActivity: AppCompatActivity(), View.OnClickListener {
         if(viewModel.urlNewsImage != null)
             urlNewsImage = viewModel.urlNewsImage
         selectedImageBytes = viewModel.byteArray
-        uploadImageTask = viewModel.uploadTask
-
         if (selectedImageBytes != null)
             GlideApp.with(this)
                     .load(selectedImageBytes)
                     .into(imageView)
+
+        uploadImageTask = viewModel.uploadTask
     }
 
     override fun onBackPressed() {

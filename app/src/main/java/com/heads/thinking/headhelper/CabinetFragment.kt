@@ -19,11 +19,10 @@ import com.heads.thinking.headhelper.dialogs.ChangeGroupDialog
 import com.heads.thinking.headhelper.dialogs.ChangePasswordDialog
 import com.heads.thinking.headhelper.glide.GlideApp
 import com.heads.thinking.headhelper.models.User
-import com.heads.thinking.headhelper.mvvm.UserViewModel
+import com.heads.thinking.headhelper.mvvm.DataViewModel
 import com.heads.thinking.headhelper.util.CustomImageManager
 import com.heads.thinking.headhelper.util.StorageUtil
 import com.heads.thinking.headhelper.util.FirestoreUtil
-import kotlinx.android.synthetic.main.fragment_cabinet.*
 
 import java.io.ByteArrayOutputStream
 
@@ -40,6 +39,7 @@ class CabinetFragment : Fragment(), View.OnClickListener {
                               savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_cabinet, container, false)
 
+        //init views
         val makePhotoBtn: ImageButton = view.findViewById(R.id.makePhotoBtn)
         val changeGroupBtn: Button = view.findViewById(R.id.changeGroupBtn)
         val changePasswordBtn: Button = view.findViewById(R.id.changePasswordBtn)
@@ -48,6 +48,7 @@ class CabinetFragment : Fragment(), View.OnClickListener {
         avatarIV = view.findViewById(R.id.avatarIV)
         usersNameTV = view.findViewById(R.id.usernameTV)
         groupIdTV = view.findViewById(R.id.groupIdTV)
+        //end init views
 
         makePhotoBtn.setOnClickListener(this)
         changeGroupBtn.setOnClickListener(this)
@@ -58,9 +59,8 @@ class CabinetFragment : Fragment(), View.OnClickListener {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        val userViewModel : UserViewModel = ViewModelProviders.of(this).get(UserViewModel::class.java)
-        userViewModel.getUser().observe(this.activity!!, object : Observer<User> {
-
+        val dataViewModel : DataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
+        dataViewModel.getUser().observe(this.activity!!, object : Observer<User> {
             override fun onChanged(changedUser: User?) {
                 if (changedUser != null) {
                     user = changedUser
@@ -72,7 +72,6 @@ class CabinetFragment : Fragment(), View.OnClickListener {
                                 .into(avatarIV)
                 }
             }
-
         })
     }
 
@@ -140,6 +139,7 @@ class CabinetFragment : Fragment(), View.OnClickListener {
     fun signOut() {
         AlertDialog.Builder(this.context!!).setTitle("Выйти из аккаунта?")
                 .setPositiveButton("Выйти", {dialogInterface, i ->
+                    FirestoreUtil.userSignOut()
                     AuthUI.getInstance().signOut(this.context!!).addOnCompleteListener{
                         if(it.isSuccessful)
                             startActivity(Intent(this.context, SplashActivity::class.java))

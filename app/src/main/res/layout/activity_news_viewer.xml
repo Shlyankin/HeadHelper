@@ -160,7 +160,10 @@
                         android:fontFamily="sans-serif-condensed"
                         android:text="Текст новости"
                         android:textColor="@color/alternative"
-                        android:textSize="24sp" />
+                        android:textSize="24sp"
+                        android:autoLink="all"
+                        android:linksClickable="true"
+                        android:textIsSelectable="true"/>
                 </android.support.v7.widget.CardView>
 
             </LinearLayout>

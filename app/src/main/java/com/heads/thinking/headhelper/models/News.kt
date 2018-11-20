@@ -22,6 +22,7 @@ data class News(
             parcel.readString(),
             parcel.readString()) {}
 
+    //конструктор по умолчанию для firestore
     constructor(): this("", "", null, null, "", "", null)
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {

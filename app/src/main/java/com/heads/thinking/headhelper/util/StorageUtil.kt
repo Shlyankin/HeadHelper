@@ -8,13 +8,16 @@ import java.util.*
 
 
 object StorageUtil {
+    //ссылка на корень хранилища
     private val storageInstance: FirebaseStorage by lazy { FirebaseStorage.getInstance() }
 
+    //ссылка на папку пользователя
     private val currentUserRef: StorageReference
         get() = storageInstance.reference
                 .child("users").child(FirebaseAuth.getInstance().currentUser?.uid
                         ?: throw NullPointerException("UID is null."))
 
+    //отправка фото профиля пользователя на сервер
     fun uploadProfilePhoto(imageBytes: ByteArray,
                            onSuccess: (imagePath: String) -> Unit) {
         val user = FirestoreUtil.currentUser
@@ -39,7 +42,7 @@ object StorageUtil {
             }
     }
 
-
+    // загрузка изображений чата
     fun uploadMessageImage(imageBytes: ByteArray,
                            onSuccess: (imagePath: String) -> Unit) {
         val ref = currentUserRef.child("messages/${UUID.nameUUIDFromBytes(imageBytes)}")
@@ -49,6 +52,7 @@ object StorageUtil {
                 }
     }
 
+    // отправка  изображения новости
     fun uploadNewsImage(imageBytes: ByteArray, setUrl: (url: String) -> Unit) : UploadTask {
         // или fromBytes, но тогда одинаковые изображения будут храниться одним файлом и при удалении одного удалится фото во всех новостях
         val urlNews : String = UUID.randomUUID().toString()
@@ -62,5 +66,6 @@ object StorageUtil {
             }
     }
 
+    // Получить полный путь к файлу по частичному
     fun pathToReference(path: String) = storageInstance.getReference(path)
 }

@@ -32,11 +32,9 @@ class ChangeGroupDialog: DialogFragment() {
         val builder: AlertDialog.Builder = AlertDialog.Builder(this.activity!!)
         val layoutInflater = inflater?.inflate(R.layout.dialog_change_group, null)
         builder.setView(layoutInflater)
-
         idGroupET = layoutInflater!!.findViewById(R.id.groupIdET)
 
-
-
+        //TODO не получается выводить крутилку, т.к. не получается обработать поворот экрана. isAdded, context != null возвращают true
         builder.setTitle("Смена группы")
         builder.setPositiveButton("Вступить в группу", { dialogInterface: DialogInterface, i: Int ->
                 FirestoreUtil.changeGroup(idGroupET.text.toString(), { isSuccessful: Boolean, message: String ->

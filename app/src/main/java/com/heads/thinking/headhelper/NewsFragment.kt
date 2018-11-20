@@ -1,10 +1,7 @@
 package com.heads.thinking.headhelper
 
-import android.app.Activity
 import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProviders
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
@@ -15,16 +12,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import com.google.firebase.firestore.ListenerRegistration
 import com.heads.thinking.headhelper.adapters.NewsRecyclerAdapter
 import com.heads.thinking.headhelper.models.News
 import com.heads.thinking.headhelper.models.User
-import com.heads.thinking.headhelper.mvvm.NewsViewModel
-import com.heads.thinking.headhelper.util.FirestoreUtil
+import com.heads.thinking.headhelper.mvvm.DataViewModel
 
 class NewsFragment : Fragment(), View.OnClickListener {
 
-    lateinit var newsViewModel: NewsViewModel
+    lateinit var dataViewModel: DataViewModel
     lateinit var addNewsBtn: FloatingActionButton
     lateinit var newsRecyclerView: RecyclerView
     lateinit var adapterNewsRecyclerAdapter: NewsRecyclerAdapter
@@ -48,12 +43,12 @@ class NewsFragment : Fragment(), View.OnClickListener {
                               savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_news, container, false)
 
-        newsViewModel = ViewModelProviders.of(this).get(NewsViewModel::class.java)
+        dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
 
         newsRecyclerView = view.findViewById(R.id.newsRecyclerView)
         newsRecyclerView.layoutManager = LinearLayoutManager(App.instance?.applicationContext, LinearLayoutManager.VERTICAL, false)
         newsRecyclerView.hasFixedSize()
-        adapterNewsRecyclerAdapter = NewsRecyclerAdapter(this.context!!, ArrayList<News>(), newsViewModel)
+        adapterNewsRecyclerAdapter = NewsRecyclerAdapter(this.context!!, ArrayList<News>(), dataViewModel)
         newsRecyclerView.adapter = adapterNewsRecyclerAdapter
         addNewsBtn = view.findViewById(R.id.addNewsFab)
         addNewsBtn.setOnClickListener(this)
@@ -62,12 +57,12 @@ class NewsFragment : Fragment(), View.OnClickListener {
 
     override fun onStart() {
         super.onStart()
-        newsViewModel.getUser().observe(this.activity!!, Observer<User> {user: User? ->
+        dataViewModel.getUser().observe(this.activity!!, Observer<User> { user: User? ->
             if(user != null && user.privilege != 0) {
                 addNewsBtn.visibility = View.VISIBLE
             }
         })
-        newsViewModel.getNews().observe(this.activity!!, Observer<ArrayList<News>> { changedNews ->
+        dataViewModel.getNews().observe(this.activity!!, Observer<ArrayList<News>> { changedNews ->
             if(changedNews != null) {
                 newsList = changedNews
                 adapterNewsRecyclerAdapter.list = newsList

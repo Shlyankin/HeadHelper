@@ -10,5 +10,6 @@ data class User(val id: String,
                 val profilePicturePath: String?,
                 val registrationTokens: MutableList<String>,
                 val groupId: String?) {
+    //конструктор по умолчанию для firestore
     constructor(): this("", "", 0,null, mutableListOf(), null)
 }

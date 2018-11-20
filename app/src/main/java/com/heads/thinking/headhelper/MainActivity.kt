@@ -5,17 +5,11 @@ import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
 import android.support.v4.app.Fragment
-import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
-import android.view.MenuItem
-import android.widget.Toast
-import com.heads.thinking.headhelper.util.FirestoreUtil
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var userViewModel : MainActivityViewModel
-    private lateinit var prevItemMenu: MenuItem
-    private lateinit var viewPager: ViewPager
+    private lateinit var viewModel : MainActivityViewModel
     private lateinit var navigation: BottomNavigationView
 
     private val fragmentsArray = ArrayList<Fragment>()
@@ -23,15 +17,15 @@ class MainActivity : AppCompatActivity() {
     private val onNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
             R.id.navigation_chat -> {
-                userViewModel.selectedMenusId = R.id.navigation_chat
+                viewModel.selectedMenusId = R.id.navigation_chat
                 loadFragment(ChatFragment())
             }
             R.id.navigation_news -> {
-                userViewModel.selectedMenusId = R.id.navigation_news
+                viewModel.selectedMenusId = R.id.navigation_news
                 loadFragment(NewsFragment())
             }
             R.id.navigation_cabinet -> {
-                userViewModel.selectedMenusId = R.id.navigation_cabinet
+                viewModel.selectedMenusId = R.id.navigation_cabinet
                 loadFragment(CabinetFragment())
             }
 
@@ -55,8 +49,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         navigation = findViewById(R.id.navigation)
         navigation.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener)
-        userViewModel = ViewModelProviders.of(this).get(MainActivityViewModel::class.java)
-        navigation.selectedItemId = userViewModel.selectedMenusId
+        viewModel = ViewModelProviders.of(this).get(MainActivityViewModel::class.java)
+        navigation.selectedItemId = viewModel.selectedMenusId
         //TODO предложить пользователю вступить в группу
         //checkUser()
     }

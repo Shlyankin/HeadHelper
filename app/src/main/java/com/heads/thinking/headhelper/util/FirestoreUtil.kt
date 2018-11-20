@@ -12,10 +12,12 @@ object FirestoreUtil {
     private var groupReference: DocumentReference? = null
     var currentUser: User? = null
 
+    // ссылка на текущего пользователя
     private val currentUserDocRef: DocumentReference
         get() = firestoreInstance.document("users/${FirebaseAuth.getInstance().currentUser?.uid
                 ?: throw NullPointerException("UID is null.")}")
 
+    //листенер текущего пользователя
     var useListener: ListenerRegistration = currentUserDocRef.addSnapshotListener {
         documentSnapshot: DocumentSnapshot?, firebaseFirestoreException: FirebaseFirestoreException? ->
         if(firebaseFirestoreException == null && documentSnapshot?.exists() ?: false) {
@@ -25,6 +27,7 @@ object FirestoreUtil {
         }
     }
 
+    // действи, которые НЕОБХОДИМО выполнить при выходе пользователя
     fun userSignOut() {
         removeListener(useListener)
         groupReference = null
@@ -67,6 +70,7 @@ object FirestoreUtil {
     }
 
 
+    // добавить слушателя для пользователя
     fun addUserListener(onChange: (documentSnapshot: DocumentSnapshot?,
                                    firebaseFirestoreException: FirebaseFirestoreException?) -> Unit) : ListenerRegistration {
         return currentUserDocRef.addSnapshotListener{ documentSnapshot: DocumentSnapshot?,
@@ -75,6 +79,7 @@ object FirestoreUtil {
         }
     }
 
+    //инициализировать пользователя, если он зашел в первый раз
     fun initCurrentUserIfFirstTime(onComplete: () -> Unit) {
         currentUserDocRef.get().addOnSuccessListener { documentSnapshot ->
             if (!documentSnapshot.exists()) {
@@ -89,6 +94,7 @@ object FirestoreUtil {
         }
     }
 
+    //обновление данных о пользователе на сервере
     fun updateCurrentUserData(name: String = "", privilege: Int? = null, profilePicturePath: String? = null, groupId: String?) {
         val userFieldMap = mutableMapOf<String, Any>()
         if (name.isNotBlank()) userFieldMap["name"] = name
@@ -112,6 +118,7 @@ object FirestoreUtil {
         currentUserDocRef.update(userFieldMap)
     }
 
+    // создает коллекцию группу с заданным именем
     fun createGroup(newGroupId: String, onComplete: (isSuccessful: Boolean, message: String) -> Unit) {
         if(newGroupId == "") {
             onComplete(false, "Поле не задано")
@@ -135,6 +142,7 @@ object FirestoreUtil {
             }
     }
 
+    //смены группы пользователя
     fun changeGroup(newGroupId: String, onComplete: (isSuccessful:Boolean, message: String) -> Unit) {
         if(newGroupId == "") {
             onComplete(false, "Вы не состоите в группе")
@@ -157,6 +165,7 @@ object FirestoreUtil {
             }
     }
 
+    // отправка новости в группу пользователя
     fun sendNews(news: News, onComplete: (isSuccessful: Boolean, message: String) -> Unit) {
         val documentReference = groupReference
         if(documentReference != null)
@@ -166,6 +175,7 @@ object FirestoreUtil {
         else onComplete(false, "Проверьте состоите ли вы в группе")
     }
 
+    //удаление новости из группы пользователя
     fun deleteNews(id: String, onComplete: (isSuccessful: Boolean) -> Unit) {
         val documentReference = groupReference
         if(documentReference != null) {
@@ -182,6 +192,7 @@ object FirestoreUtil {
         }
     }
 
+    // получить все новости
     fun getNews(onComplete: (isSuccessful: Boolean, news: ArrayList<News>?) -> Unit){
         val documentReference = FirestoreUtil.groupReference
         if(documentReference != null) {
@@ -197,8 +208,7 @@ object FirestoreUtil {
         }
     }
 
-
-
+    //добавить слушателя на новости группы
     fun addNewsListener(onCreateListener: (listener: ListenerRegistration?) -> Unit,
                         onChange: (isSuccessful: Boolean, message: String, groupId: String?, querySnapshot: QuerySnapshot?,
                                    firebaseFirestoreException: FirebaseFirestoreException?) -> Unit) {
@@ -222,13 +232,14 @@ object FirestoreUtil {
         }
     }
 
+    //удалить любой слушатель
     fun removeListener(registration: ListenerRegistration) = registration.remove()
 
     fun sendMessage() {
-        //TODO
+        //TODO отправлять сообщение в коллекцию chat группы
     }
 
     fun addChatMessagesListener() {
-        //TODO
+        //TODO добавить слушателя на сообщения
     }
 }

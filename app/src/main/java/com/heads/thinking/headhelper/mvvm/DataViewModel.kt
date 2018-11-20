@@ -11,13 +11,12 @@ import com.heads.thinking.headhelper.models.User
 import com.heads.thinking.headhelper.util.FirestoreUtil
 import java.util.*
 
-class NewsViewModel: ViewModel() {
+class DataViewModel: ViewModel() {
 
     var user: MutableLiveData<User> = MutableLiveData()
-    var newsListener: ListenerRegistration? = null
-    var userListener: ListenerRegistration? = null
-    var groupId: String? = null
     var news : MutableLiveData<ArrayList<News>> = MutableLiveData<ArrayList<News>>()
+    private var newsListener: ListenerRegistration? = null
+    private var userListener: ListenerRegistration? = null
 
     fun getUser() : LiveData<User> {
         if(userListener == null) addUserListener()
@@ -29,12 +28,14 @@ class NewsViewModel: ViewModel() {
         return news
     }
 
-    fun removeNewsListener() {
+    //удалить ссылку на новости
+    private fun removeNewsListener() {
         if(newsListener != null)
             FirestoreUtil.removeListener(newsListener!!)
     }
 
-    fun addNewsListener() {
+    //добавить ссылку на новости
+    private fun addNewsListener() {
         news.postValue(ArrayList<News>())
         FirestoreUtil.addNewsListener(
             {
@@ -48,6 +49,13 @@ class NewsViewModel: ViewModel() {
         )
     }
 
+    // обновить ссылкку на новости
+    fun updateNewsListener() {
+        removeNewsListener()
+        addNewsListener()
+    }
+
+    //Переводит данные из объекта snapshot в список
     private fun toListNews(querySnapshot: QuerySnapshot) : ArrayList<News> {
         val news: ArrayList<News> = ArrayList<News>()
         for(doc: QueryDocumentSnapshot in  querySnapshot) {
@@ -57,18 +65,13 @@ class NewsViewModel: ViewModel() {
         return news
     }
 
-    fun addUserListener() {
+    // добавит слушателя на пользователя
+    private fun addUserListener() {
         userListener = FirestoreUtil.addUserListener { documentSnapshot, firebaseFirestoreException ->
             if(firebaseFirestoreException == null && documentSnapshot?.exists() ?: false) {
                 user.postValue(documentSnapshot?.toObject(User::class.java))
-                updateListener()
+                updateNewsListener()
             }
         }
-    }
-
-    fun updateListener() {
-        if(newsListener != null)
-            removeNewsListener()
-        addNewsListener()
     }
 }
