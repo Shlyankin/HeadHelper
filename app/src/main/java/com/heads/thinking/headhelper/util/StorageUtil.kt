@@ -19,7 +19,7 @@ object StorageUtil {
 
     //отправка фото профиля пользователя на сервер
     fun uploadProfilePhoto(imageBytes: ByteArray,
-                           onSuccess: (imagePath: String) -> Unit) {
+                           onSuccess: (imagePath: String) -> Unit) { //TODO maybe UploadTask?
         val user = FirestoreUtil.currentUser
         if (user?.profilePicturePath != null && user.profilePicturePath != "")
             storageInstance.reference.child(user.profilePicturePath).delete()
@@ -53,17 +53,36 @@ object StorageUtil {
     }
 
     // отправка  изображения новости
-    fun uploadNewsImage(imageBytes: ByteArray, setUrl: (url: String) -> Unit) : UploadTask {
-        // или fromBytes, но тогда одинаковые изображения будут храниться одним файлом и при удалении одного удалится фото во всех новостях
-        val urlNews : String = UUID.randomUUID().toString()
-        setUrl(urlNews)
-        return storageInstance.reference.child(urlNews).putBytes(imageBytes)
+    fun uploadNewsImage(imageBytes: ByteArray, setUrl: (url: String) -> Unit) : UploadTask? {
+
+        val currUser = FirestoreUtil.currentUser
+        if(currUser != null) {
+
+            // или fromBytes, но тогда одинаковые изображения будут храниться одним файлом
+            // и при удалении одного удалится фото во всех новостях
+            val urlNews: String = currUser.groupId + "\\" +UUID.randomUUID().toString()
+            setUrl(urlNews)
+            return storageInstance.reference.child(urlNews).putBytes(imageBytes)
+        }
+        return null
     }
 
     fun deleteNewsImage(uriPath: String, OnComplete: (isSuccessful: Boolean) -> Unit) {
             storageInstance.reference.child(uriPath).delete().addOnCompleteListener {
                 OnComplete(it.isSuccessful)
             }
+    }
+
+    fun uploadChatImage(imageBytes: ByteArray, setUrl: (url: String) -> Unit) : UploadTask? {
+        val curUser = FirestoreUtil.currentUser
+        if(curUser != null) {
+            // nameUUIDFromBytes, т.к. картинки не удаляются,
+            // то мы можем хранить их для всех сообщений как один файл
+            val url: String = curUser.groupId + "\\" + UUID.nameUUIDFromBytes(imageBytes)
+            setUrl(url)
+            return storageInstance.reference.child(url).putBytes(imageBytes)
+        }
+        return null
     }
 
     // Получить полный путь к файлу по частичному

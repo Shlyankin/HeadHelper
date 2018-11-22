@@ -48,7 +48,9 @@
                     android:padding="5dp"
                     android:text="Username"
                     android:textColor="@color/colorAccent"
-                    android:textSize="18sp" />
+                    android:textSize="18sp"
+                    android:maxLines="1"
+                    android:ellipsize="end"/>
 
             </LinearLayout>
 

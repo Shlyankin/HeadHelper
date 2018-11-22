@@ -20,6 +20,7 @@ import com.heads.thinking.headhelper.mvvm.DataViewModel
 import com.heads.thinking.headhelper.util.FirestoreUtil
 import com.heads.thinking.headhelper.util.StorageUtil
 import de.hdodenhof.circleimageview.CircleImageView
+import java.text.DateFormat
 import java.text.SimpleDateFormat
 
 class NewsRecyclerAdapter(val context: Context, var list:ArrayList<News>, val dataViewModel: DataViewModel): RecyclerView.Adapter<NewsRecyclerAdapter.ViewHolder>() {

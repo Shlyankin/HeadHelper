@@ -13,8 +13,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.support.v7.app.AlertDialog
+import android.support.v7.widget.CardView
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.widget.*
 import com.firebase.ui.auth.AuthUI
+import com.heads.thinking.headhelper.adapters.MembersRecyclerViewAdapter
 import com.heads.thinking.headhelper.dialogs.ChangeGroupDialog
 import com.heads.thinking.headhelper.dialogs.ChangePasswordDialog
 import com.heads.thinking.headhelper.glide.GlideApp
@@ -23,17 +27,20 @@ import com.heads.thinking.headhelper.mvvm.DataViewModel
 import com.heads.thinking.headhelper.util.CustomImageManager
 import com.heads.thinking.headhelper.util.StorageUtil
 import com.heads.thinking.headhelper.util.FirestoreUtil
+import kotlinx.android.synthetic.*
 
 import java.io.ByteArrayOutputStream
 
 
 class CabinetFragment : Fragment(), View.OnClickListener {
 
-    private lateinit var user: User
-
     private lateinit var avatarIV: ImageView
     private lateinit var usersNameTV: TextView
     private lateinit var groupIdTV: TextView
+
+    private lateinit var membersCardView: CardView
+    private lateinit var membersRecyclerView: RecyclerView
+    private lateinit var membersRecyclerViewAdapter: MembersRecyclerViewAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -50,6 +57,14 @@ class CabinetFragment : Fragment(), View.OnClickListener {
         groupIdTV = view.findViewById(R.id.groupIdTV)
         //end init views
 
+        membersCardView = view.findViewById(R.id.membersCardView)
+        membersRecyclerView = view.findViewById(R.id.membersRecyclerView)
+        membersRecyclerView.layoutManager = LinearLayoutManager(App.instance?.applicationContext,
+                LinearLayoutManager.VERTICAL, false)
+        membersRecyclerView.hasFixedSize()
+        membersRecyclerViewAdapter = MembersRecyclerViewAdapter(ArrayList())
+        membersRecyclerView.adapter = membersRecyclerViewAdapter
+
         makePhotoBtn.setOnClickListener(this)
         changeGroupBtn.setOnClickListener(this)
         changePasswordBtn.setOnClickListener(this)
@@ -63,13 +78,23 @@ class CabinetFragment : Fragment(), View.OnClickListener {
         dataViewModel.getUser().observe(this.activity!!, object : Observer<User> {
             override fun onChanged(changedUser: User?) {
                 if (changedUser != null) {
-                    user = changedUser
                     usersNameTV.text = changedUser.name
                     groupIdTV.text = changedUser.groupId ?: ""
                     if (changedUser.profilePicturePath != null && this@CabinetFragment.activity != null)
                         GlideApp.with(this@CabinetFragment)
                                 .load(StorageUtil.pathToReference(changedUser.profilePicturePath))
                                 .into(avatarIV)
+                }
+            }
+        })
+        dataViewModel.getMembers().observe(this@CabinetFragment.activity!!, object : Observer<HashMap<String, User>> {
+            override fun onChanged(map: HashMap<String, User>?) {
+                if (map != null) {
+                    membersRecyclerViewAdapter.members = ArrayList<User>().apply {
+                        for (i in map)
+                            add(i.value)
+                    }
+                    membersRecyclerViewAdapter.notifyDataSetChanged()
                 }
             }
         })

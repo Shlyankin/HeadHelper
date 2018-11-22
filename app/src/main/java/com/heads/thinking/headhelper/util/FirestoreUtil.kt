@@ -143,6 +143,15 @@ object FirestoreUtil {
         }
     }
 
+    fun updateMembersPrivileges(userId: String, privilege: Int, onComplete: (isSuccessful: Boolean, message: String) -> Unit) {
+        val userFieldMap = mutableMapOf<String, Any>()
+        userFieldMap["privilege"] = privilege
+        firestoreInstance.document("users/" + userId).update(userFieldMap)
+                .addOnCompleteListener {
+                    onComplete(it.isSuccessful, it.exception?.message ?: "")
+                }
+    }
+
     //обновление данных о пользователе на сервере
     fun updateCurrentUserData(name: String = "", privilege: Int? = null, profilePicturePath: String? = null, groupId: String?) {
         val userFieldMap = mutableMapOf<String, Any>()
@@ -182,7 +191,7 @@ object FirestoreUtil {
                     if(it.exception is FirebaseNetworkException) {
                         onComplete(false, "Отсутствует подключение к интрнету")
                     } else {
-                        updateCurrentUserData(privilege = 1, groupId = newGroupId)
+                        updateCurrentUserData(privilege = 2, groupId = newGroupId)
                         onComplete(true, "Группа создана")
                     }
                 }

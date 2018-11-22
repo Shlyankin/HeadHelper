@@ -33,21 +33,19 @@
                 android:id="@+id/editMessageET"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="5"
+                android:layout_weight="10"
                 android:ems="10"
                 android:hint="введите сообщение"
                 android:inputType="textMultiLine" />
 
-            <Button
+            <ImageButton
                 android:id="@+id/sendMessageBtn"
-                android:layout_width="10dp"
-                android:layout_height="50dp"
-                android:layout_weight="5"
-                android:maxWidth="30dp"
-                android:maxHeight="30dp"
-                android:scaleX="0.5"
-                android:scaleY="0.8"
-                tools:background="@drawable/icon_send" />
+                android:layout_width="wrap_content"
+                android:layout_height="45dp"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:scaleType="centerInside"
+                android:src="@drawable/icon_send" />
 
         </LinearLayout>
 

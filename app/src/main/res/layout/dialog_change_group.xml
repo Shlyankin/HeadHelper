@@ -15,9 +15,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:lineSpacingExtra="8sp"
-        android:text="    Введите ID группы, к которой вы бы хотели присоединиться.
-    ID группы можно получить у старосты(создателя) группы.
-    Вы не можете состоять более чем в одной группе."
+        android:text="Введите ID группы, к которой вы бы хотели присоединиться/создать.
+
+ID группы можно получить у участников группы.
+
+Вы не можете состоять более чем в одной группе.
+
+ВНИМАНИЕ: ЕСЛИ ВЫ АДМИН ИЛИ МОДЕРАТОР, ТО ВЫ ТЕРЯЕТЕ ЭТОТ СТАТУС ПРИ СМЕНЕ ГРУППЫ"
         android:textAlignment="viewStart"
         android:textAllCaps="false"
         android:textColor="@color/colorAccent"
@@ -30,6 +34,7 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:hint="ID группы"
-        android:inputType="text" />
+        android:inputType="text"
+        android:imeOptions="flagNoExtractUi"/>
 
 </LinearLayout>

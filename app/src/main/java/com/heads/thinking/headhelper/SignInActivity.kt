@@ -64,10 +64,12 @@ class SignInActivity : AppCompatActivity(), View.OnClickListener {
                                 .addOnCompleteListener {
                                     if (it.isSuccessful) {
                                         Toast.makeText(this, "Подтверждение аккаунта выслано на почту: ${currentUser.email}", Toast.LENGTH_SHORT).show()
-                                        progressDialog.dismiss()
+                                        if(!isDestroyed)
+                                            progressDialog.dismiss()
                                     } else {
                                         Toast.makeText(this, "Не удалось отправить подтверждение на почту: ${currentUser.email}", Toast.LENGTH_SHORT).show()
-                                        progressDialog.dismiss()
+                                        if(!isDestroyed)
+                                            progressDialog.dismiss()
                                     }
                                 }
                     } else {

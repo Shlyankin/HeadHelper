@@ -6,7 +6,6 @@ import java.util.*
 
 data class News(
         val id: String,
-        val category: String,
         val date: Date?,
         val picturePath: String?,
         val tittle: String,
@@ -15,7 +14,6 @@ data class News(
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
             parcel.readString(),
-            parcel.readString(),
             null,
             parcel.readString(),
             parcel.readString(),
@@ -23,11 +21,10 @@ data class News(
             parcel.readString()) {}
 
     //конструктор по умолчанию для firestore
-    constructor(): this("", "", null, null, "", "", null)
+    constructor(): this("", null, null, "", "", null)
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(id)
-        parcel.writeString(category)
         parcel.writeString(picturePath)
         parcel.writeString(tittle)
         parcel.writeString(text)

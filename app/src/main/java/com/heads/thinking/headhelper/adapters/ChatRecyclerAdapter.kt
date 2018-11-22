@@ -68,9 +68,13 @@ class ChatRecyclerAdapter(var messages: ArrayList<Message>, var members: HashMap
                 if(user.id == FirestoreUtil.currentUser?.id) {
                     val layoutParams: FrameLayout.LayoutParams = cardView.layoutParams as FrameLayout.LayoutParams
                     layoutParams.gravity = Gravity.LEFT
+                    layoutParams.marginEnd = 80
+                    layoutParams.marginStart = 10
                 } else {
                     val layoutParams: FrameLayout.LayoutParams = cardView.layoutParams as FrameLayout.LayoutParams
                     layoutParams.gravity = Gravity.RIGHT
+                    layoutParams.marginStart = 80
+                    layoutParams.marginEnd = 10
                 }
             }
         }

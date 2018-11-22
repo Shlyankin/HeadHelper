@@ -77,7 +77,8 @@
                 android:fontFamily="sans-serif-condensed"
                 android:hint="Заголовок"
                 android:inputType="textPersonName"
-                android:textSize="30sp" />
+                android:textSize="30sp"
+                android:imeOptions="flagNoExtractUi"/>
 
             <EditText
                 android:id="@+id/textET"
@@ -87,7 +88,8 @@
                 android:fontFamily="sans-serif-condensed"
                 android:hint="Текст новости"
                 android:inputType="textMultiLine"
-                android:textSize="24sp" />
+                android:textSize="24sp"
+                android:imeOptions="flagNoExtractUi"/>
         </LinearLayout>
     </ScrollView>
 

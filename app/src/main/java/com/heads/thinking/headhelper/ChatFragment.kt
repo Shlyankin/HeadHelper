@@ -27,7 +27,7 @@ import kotlin.collections.HashMap
 class ChatFragment : Fragment(), View.OnClickListener {
 
     lateinit var editMessageET: EditText
-    lateinit var sendMessageButton: Button
+    lateinit var sendMessageButton: ImageButton
     lateinit var chatRecyclerView: RecyclerView
     lateinit var chatRecyclerAdapter: ChatRecyclerAdapter
 
@@ -38,6 +38,7 @@ class ChatFragment : Fragment(), View.OnClickListener {
             R.id.sendMessageBtn -> {
                 val id = UUID.randomUUID().toString()
                 val textMessage = editMessageET.text.toString()
+                editMessageET.setText("")
                 if(textMessage == "") {
                     Toast.makeText(this.context, "Вы ничего не ввели", Toast.LENGTH_SHORT).show()
                 } else {
@@ -49,10 +50,6 @@ class ChatFragment : Fragment(), View.OnClickListener {
                 }
             }
         }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -89,7 +86,7 @@ class ChatFragment : Fragment(), View.OnClickListener {
                 if (messages != null) {
                     chatRecyclerAdapter.updateMessages(messages)
                     chatRecyclerAdapter.notifyDataSetChanged()
-                    if(chatRecyclerView.verticalScrollbarPosition == chatRecyclerAdapter.itemCount - 2) // check this
+                    if(chatRecyclerView.verticalScrollbarPosition == chatRecyclerAdapter.itemCount - 2 || chatRecyclerView.verticalScrollbarPosition == 0) // check this
                         chatRecyclerView.getLayoutManager()
                             ?.scrollToPosition(chatRecyclerAdapter.itemCount - 1)
                 }
