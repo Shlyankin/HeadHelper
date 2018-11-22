@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.heads.thinking.headhelper.util.FirestoreUtil
 
 class SplashActivity : AppCompatActivity() {
 
@@ -21,6 +22,7 @@ class SplashActivity : AppCompatActivity() {
         startActivity(
                 if(currentUser != null) {
                     if(currentUser.isEmailVerified) {
+                        FirestoreUtil.userSignIn()
                         Intent(this, MainActivity::class.java)
                     }
                     else {

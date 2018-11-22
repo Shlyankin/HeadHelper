@@ -72,7 +72,7 @@ class SignInActivity : AppCompatActivity(), View.OnClickListener {
                                 }
                     } else {
                         FirestoreUtil.initCurrentUserIfFirstTime {
-                            startActivity(intentFor<MainActivity>().newTask().clearTask())
+                            startActivity(intentFor<SplashActivity>().newTask().clearTask())
                             progressDialog.dismiss()
                         }
                     }

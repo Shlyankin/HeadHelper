@@ -3,6 +3,8 @@ package com.heads.thinking.headhelper.util
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.*
+import com.google.firebase.firestore.local.QueryData
+import com.heads.thinking.headhelper.models.Message
 import com.heads.thinking.headhelper.models.News
 import com.heads.thinking.headhelper.models.User
 
@@ -18,41 +20,88 @@ object FirestoreUtil {
                 ?: throw NullPointerException("UID is null.")}")
 
     //листенер текущего пользователя
-    var useListener: ListenerRegistration = currentUserDocRef.addSnapshotListener {
-        documentSnapshot: DocumentSnapshot?, firebaseFirestoreException: FirebaseFirestoreException? ->
-        if(firebaseFirestoreException == null && documentSnapshot?.exists() ?: false) {
-            currentUser = documentSnapshot!!.toObject(User::class.java)
-            if(currentUser?.groupId != null)
-                groupReference = firestoreInstance.collection("groups").document(currentUser?.groupId!!)
+    var userListener: ListenerRegistration? = null
+
+    fun userSignIn() {
+        if(userListener == null) {
+            userListener = currentUserDocRef.addSnapshotListener { documentSnapshot: DocumentSnapshot?, firebaseFirestoreException: FirebaseFirestoreException? ->
+                if (firebaseFirestoreException == null && documentSnapshot?.exists() ?: false) {
+                    currentUser = documentSnapshot!!.toObject(User::class.java)
+                    if (currentUser?.groupId != null)
+                        groupReference = firestoreInstance.collection("groups").document(currentUser?.groupId!!)
+                }
+            }
         }
     }
 
     // действи, которые НЕОБХОДИМО выполнить при выходе пользователя
     fun userSignOut() {
-        removeListener(useListener)
+        if(userListener != null)
+            removeListener(userListener!!)
+        userListener = null
         groupReference = null
         currentUser = null
     }
+/*
+    fun addMembersListener(onChange: (isSuccessful: Boolean, membersRef: ArrayList<String>?) -> Unit): ListenerRegistration? {
+        val ref = groupReference
+        if(ref != null) {
+            return ref.collection("users").addSnapshotListener {
+                querySnapshot, firebaseFirestoreException ->
+                if(firebaseFirestoreException == null) {
+                    val membersRef = ArrayList<String>().apply {
+                        for(doc in querySnapshot!!)
+                            add(doc["memberRef"].toString())
+                    }
+                    onChange(true, membersRef)
+                } else {
+                    onChange(false, null)
+                }
+            }
+        } else return null
+    }*/
 
-    // переделать
-    fun getMembers(onComplete: (isSuccessful: Boolean, message: String,  members: ArrayList<User>?) -> Unit) {
-        if(currentUser != null) {
-            if (currentUser?.groupId != null) {
-                firestoreInstance.collection("groups").document(currentUser?.groupId ?: "").collection("members").get()
-                        .addOnSuccessListener {
-                            if (!it.isEmpty) {
-                                val list: ArrayList<User> = ArrayList()
-                                for (document in it) {
-                                    list.add(document.toObject(User::class.java))
-                                }
-                                onComplete(true, "", list)
-                            } else {
-                                onComplete(true, "Никого нет в группе", ArrayList())
+    fun getMemb(onChange: (isSuccessful: Boolean, members: HashMap<String, User>?) -> Unit)
+            : ListenerRegistration? {
+        val currUser = currentUser
+        if(currUser != null) {
+            return firestoreInstance.collection("users").whereEqualTo("groupId", currUser.groupId)
+                    .addSnapshotListener { querySnapshot, firebaseFirestoreException ->
+                        if(firebaseFirestoreException == null) {
+                            val map: HashMap<String, User> = HashMap()
+                            for (doc in querySnapshot!!) {
+                                val user = doc.toObject(User::class.java)
+                                map.put(user.id, user)
                             }
-                        }
-            } else onComplete(false, "Вы не состоите в группе", null)
+                            onChange(true, map)
+                        } else onChange(false, null)
+                    }
+        } else {
+            return null
         }
     }
+
+    /*// переделать
+    fun getMembers(onComplete: (isSuccessful: Boolean, message: String,  members: HashMap<String, User>?) -> Unit) {
+        val ref = groupReference
+        if(ref != null) {
+            ref.collection("members").get()
+                .addOnSuccessListener {
+                    if (!it.isEmpty) {
+                        val map: HashMap<String, User> = HashMap<String, User>()
+                        for (document in it) {
+                            val memberRef: String = document["memberRef"].toString()
+                            getUser(memberRef, { isSuccessful, user ->
+                                if(isSuccessful) map.put(memberRef, user!!)
+                            })
+                        }
+                        onComplete(true, "", map)
+                    } else {
+                        onComplete(true, "Никого нет в группе", HashMap())
+                    }
+                }
+        }
+    }*/
 
     //получить любого пользователя по ссылке
     fun getUser(userPath: String, onComplete: (isSuccessful: Boolean, user: User?) -> Unit) {
@@ -102,7 +151,8 @@ object FirestoreUtil {
         if (profilePicturePath != null)
             userFieldMap["profilePicturePath"] = profilePicturePath
         if (groupId != null) {
-                if (currentUser!!.groupId != null && currentUser!!.groupId != "")
+            val user = currentUser
+                if (user != null && user.groupId != null && user.groupId != "")
                     firestoreInstance.collection("groups")
                             .document("${currentUser!!.groupId}").collection("members")
                             .document(FirebaseAuth.getInstance().currentUser?.uid.toString()).delete()
@@ -209,37 +259,48 @@ object FirestoreUtil {
     }
 
     //добавить слушателя на новости группы
-    fun addNewsListener(onCreateListener: (listener: ListenerRegistration?) -> Unit,
-                        onChange: (isSuccessful: Boolean, message: String, groupId: String?, querySnapshot: QuerySnapshot?,
-                                   firebaseFirestoreException: FirebaseFirestoreException?) -> Unit) {
+    fun addNewsListener(onChange: (isSuccessful: Boolean, message: String, querySnapshot: QuerySnapshot?,
+                                   firebaseFirestoreException: FirebaseFirestoreException?) -> Unit): ListenerRegistration? {
         val documentReference = FirestoreUtil.groupReference
         if(documentReference != null) {
-            val user = currentUser
-            if (user != null) {
-                onCreateListener(
-                        documentReference.collection("news").orderBy("date", Query.Direction.DESCENDING).addSnapshotListener { querySnapshot: QuerySnapshot?, firebaseFirestoreException: FirebaseFirestoreException? ->
-                            if(firebaseFirestoreException == null && querySnapshot != null)
-                                onChange(true, "", user.groupId, querySnapshot, firebaseFirestoreException)
-                            else
-                                onChange(false, "Что-то пошло не так", user.groupId, querySnapshot, firebaseFirestoreException)
-                        }
-                )
-            } else {
-                onCreateListener(null)
-                onChange(false, "Не могу загрузить новости.\nПроверьте состоите ли вы в гурппе",
-                        null, null, null)
+            return documentReference.collection("news").orderBy("date", Query.Direction.DESCENDING)
+                    .addSnapshotListener { querySnapshot: QuerySnapshot?,
+                                           firebaseFirestoreException: FirebaseFirestoreException? ->
+                if(firebaseFirestoreException == null && querySnapshot != null)
+                    onChange(true, "", querySnapshot, firebaseFirestoreException)
+                else
+                    onChange(false, "Что-то пошло не так", querySnapshot, firebaseFirestoreException)
             }
         }
+        return null
     }
 
     //удалить любой слушатель
     fun removeListener(registration: ListenerRegistration) = registration.remove()
 
-    fun sendMessage() {
-        //TODO отправлять сообщение в коллекцию chat группы
+    fun sendMessage(message: Message, onComplete: (isSuccessful: Boolean) -> Unit) {
+        val documentReference = FirestoreUtil.groupReference
+        if(documentReference != null) {
+            documentReference.collection("chat").document(message.id).set(message).addOnCompleteListener {
+                onComplete(it.isSuccessful)
+            }
+        }
     }
 
-    fun addChatMessagesListener() {
-        //TODO добавить слушателя на сообщения
+    fun addChatMessagesListener(onChange: (isSuccessful: Boolean, message: String, querySnapshot: QuerySnapshot?, firebaseFirestoreException: FirebaseFirestoreException?) -> Unit): ListenerRegistration? {
+        val documentReference = FirestoreUtil.groupReference
+        if(documentReference != null) {
+            return documentReference.collection("chat")
+                    .orderBy("date", Query.Direction.ASCENDING)
+                    .limit(100)
+                    .addSnapshotListener { querySnapshot: QuerySnapshot?,
+                                           firebaseFirestoreException: FirebaseFirestoreException? ->
+                        if(firebaseFirestoreException == null && querySnapshot != null)
+                            onChange(true, "", querySnapshot, firebaseFirestoreException)
+                        else
+                            onChange(false, "Что-то пошло не так", querySnapshot, firebaseFirestoreException)
+                    }
+        }
+        return null
     }
 }

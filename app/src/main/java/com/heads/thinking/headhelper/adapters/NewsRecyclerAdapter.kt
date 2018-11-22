@@ -9,7 +9,6 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import com.heads.thinking.headhelper.App
@@ -20,6 +19,7 @@ import com.heads.thinking.headhelper.models.News
 import com.heads.thinking.headhelper.mvvm.DataViewModel
 import com.heads.thinking.headhelper.util.FirestoreUtil
 import com.heads.thinking.headhelper.util.StorageUtil
+import de.hdodenhof.circleimageview.CircleImageView
 import java.text.SimpleDateFormat
 
 class NewsRecyclerAdapter(val context: Context, var list:ArrayList<News>, val dataViewModel: DataViewModel): RecyclerView.Adapter<NewsRecyclerAdapter.ViewHolder>() {
@@ -42,7 +42,7 @@ class NewsRecyclerAdapter(val context: Context, var list:ArrayList<News>, val da
                         if (it) {
                             Toast.makeText(App.instance, "Новость удалена", Toast.LENGTH_SHORT).show()
                             if (list.size == 1)
-                                dataViewModel.updateNewsListener()
+                                dataViewModel.updateListeners()
                             if (deletingNews.picturePath != null)
                                 StorageUtil.deleteNewsImage(deletingNews.picturePath!!, {})
                         } else
@@ -67,7 +67,7 @@ class NewsRecyclerAdapter(val context: Context, var list:ArrayList<News>, val da
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         lateinit var newsCardView: CardView
-        lateinit var imageView: ImageView
+        lateinit var imageView: CircleImageView
         lateinit var itemHeader: TextView
         lateinit var dateTV: TextView
 
