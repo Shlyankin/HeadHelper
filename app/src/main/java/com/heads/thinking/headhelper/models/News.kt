@@ -14,7 +14,7 @@ data class News(
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
             parcel.readString(),
-            null,
+            null, //дату не инициализируем
             parcel.readString(),
             parcel.readString(),
             parcel.readString(),

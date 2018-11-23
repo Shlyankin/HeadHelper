@@ -60,7 +60,7 @@ object StorageUtil {
 
             // или fromBytes, но тогда одинаковые изображения будут храниться одним файлом
             // и при удалении одного удалится фото во всех новостях
-            val urlNews: String = currUser.groupId + "\\" +UUID.randomUUID().toString()
+            val urlNews: String = currUser.groupId + "/" +UUID.randomUUID().toString()
             setUrl(urlNews)
             return storageInstance.reference.child(urlNews).putBytes(imageBytes)
         }

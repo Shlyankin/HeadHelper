@@ -1,6 +1,5 @@
 package com.heads.thinking.headhelper.adapters
 
-import android.support.constraint.ConstraintLayout
 import android.support.v7.widget.CardView
 import android.support.v7.widget.RecyclerView
 import android.view.Gravity
@@ -16,9 +15,6 @@ import com.heads.thinking.headhelper.models.User
 import com.heads.thinking.headhelper.util.FirestoreUtil
 import com.heads.thinking.headhelper.util.StorageUtil
 import de.hdodenhof.circleimageview.CircleImageView
-import org.jetbrains.anko.backgroundColorResource
-import org.jetbrains.anko.backgroundResource
-import org.jetbrains.anko.wrapContent
 
 class ChatRecyclerAdapter(var messages: ArrayList<Message>, var members: HashMap<String, User>):
         RecyclerView.Adapter<ChatRecyclerAdapter.ViewHolder>() {

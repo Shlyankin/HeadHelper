@@ -11,7 +11,9 @@ import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.Toast
+import com.google.firebase.storage.OnProgressListener
 import com.google.firebase.storage.UploadTask
 import com.heads.thinking.headhelper.glide.GlideApp
 import com.heads.thinking.headhelper.models.News
@@ -19,6 +21,7 @@ import com.heads.thinking.headhelper.mvvm.AddNewsActivityViewModel
 import com.heads.thinking.headhelper.util.CustomImageManager
 import com.heads.thinking.headhelper.util.FirestoreUtil
 import com.heads.thinking.headhelper.util.StorageUtil
+import kotlinx.android.synthetic.main.fragment_news.*
 import java.io.ByteArrayOutputStream
 import java.util.*
 
@@ -31,6 +34,7 @@ class AddNewsActivity: AppCompatActivity(), View.OnClickListener {
     private lateinit var textET: EditText
     private lateinit var headerET: EditText
     private lateinit var imageView: ImageView
+    private lateinit var uploadProgressBar: ProgressBar
     lateinit var viewModel : AddNewsActivityViewModel
 
     override fun onClick(view: View?) {
@@ -44,7 +48,7 @@ class AddNewsActivity: AppCompatActivity(), View.OnClickListener {
                     CustomImageManager.getPhotoMakerIntent(this)?.let {
                         startActivityForResult(it, CustomImageManager.REQUEST_CODE_TAKE_PHOTO)
                     }
-                } else if(uploadImageTask!!.isComplete) {
+                } else if(uploadImageTask!!.isSuccessful) {
                     // изображение уже загружено и его надо удалить
                     StorageUtil.deleteNewsImage(urlNewsImage!!, {})
                     CustomImageManager.getPhotoMakerIntent(this)?.let {
@@ -52,7 +56,7 @@ class AddNewsActivity: AppCompatActivity(), View.OnClickListener {
                     }
                 } else {
                     // изображение в процессе загрузки и надо отменить операцию
-                    uploadImageTask!!.cancel() // Отменяем загрузку
+                    cancelUpload(uploadImageTask)// Отменяем загрузку
                     CustomImageManager.getPhotoMakerIntent(this)?.let {
                         startActivityForResult(it, CustomImageManager.REQUEST_CODE_TAKE_PHOTO)
                     }
@@ -94,6 +98,7 @@ class AddNewsActivity: AppCompatActivity(), View.OnClickListener {
         headerET = findViewById(R.id.headerET)
         textET = findViewById(R.id.textET)
         imageView = findViewById(R.id.imageView)
+        uploadProgressBar = findViewById(R.id.uploadProgressBar)
 
         viewModel = ViewModelProviders.of(this).get(AddNewsActivityViewModel::class.java)
 
@@ -119,17 +124,20 @@ class AddNewsActivity: AppCompatActivity(), View.OnClickListener {
                     .into(imageView)
 
         uploadImageTask = viewModel.uploadTask
+        startUpload(uploadImageTask)
     }
 
     override fun onBackPressed() {
         if (uploadImageTask == null) super.onBackPressed()
         else {
             if(uploadImageTask!!.isInProgress) {
-                uploadImageTask!!.cancel()
+                cancelUpload(uploadImageTask)
                 super.onBackPressed()
             }
-            else {
+            if(uploadImageTask!!.isSuccessful) {
                 StorageUtil.deleteNewsImage(urlNewsImage!!, {})
+                super.onBackPressed()
+            } else {
                 super.onBackPressed()
             }
         }
@@ -172,6 +180,7 @@ class AddNewsActivity: AppCompatActivity(), View.OnClickListener {
                 viewModel.urlNewsImage = urlImage
             })
             viewModel.uploadTask = uploadImageTask
+            startUpload(uploadImageTask)
 
             uploadImageTask!!.addOnSuccessListener {
                 Toast.makeText(App.instance, "Фото новости загружено", Toast.LENGTH_SHORT).show()
@@ -184,6 +193,30 @@ class AddNewsActivity: AppCompatActivity(), View.OnClickListener {
             }
         } else {
             Toast.makeText(App.instance, "Не удалось загрузить изображение", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun startUpload(uploadImageTask: UploadTask?) {
+        if(uploadImageTask != null && uploadImageTask.isInProgress) {
+            uploadProgressBar.visibility = View.VISIBLE
+            addNewsFab.visibility = View.INVISIBLE
+            uploadImageTask.addOnProgressListener(object : OnProgressListener<UploadTask.TaskSnapshot> {
+                override fun onProgress(taskSnapshot: UploadTask.TaskSnapshot?) {
+                    if (taskSnapshot?.bytesTransferred == taskSnapshot?.totalByteCount) {
+                        uploadProgressBar.visibility = View.GONE
+                        addNewsFab.visibility = View.VISIBLE
+                    }
+                }
+            })
+        }
+    }
+
+    fun cancelUpload(uploadImageTask: UploadTask?) {
+        if(uploadImageTask != null) {
+            uploadImageTask.cancel()
+            uploadProgressBar.visibility = View.GONE
+            addNewsFab.visibility = View.VISIBLE
+            imageView.setImageDrawable(null)
         }
     }
 }

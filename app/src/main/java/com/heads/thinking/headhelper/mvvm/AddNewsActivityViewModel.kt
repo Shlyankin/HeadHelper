@@ -4,7 +4,7 @@ import android.arch.lifecycle.ViewModel
 import com.google.firebase.storage.UploadTask
 
 class AddNewsActivityViewModel : ViewModel() {
-    //храним важные объекты при добавление новости
+    //храним необходимые объекты при загрузке фото
     var uploadTask: UploadTask? = null
     var byteArray: ByteArray? = null
     var urlNewsImage: String? = null

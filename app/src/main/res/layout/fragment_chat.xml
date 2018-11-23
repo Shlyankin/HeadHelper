@@ -36,7 +36,8 @@
                 android:layout_weight="10"
                 android:ems="10"
                 android:hint="введите сообщение"
-                android:inputType="textMultiLine" />
+                android:inputType="textMultiLine"
+                android:imeOptions="flagNoExtractUi" />
 
             <ImageButton
                 android:id="@+id/sendMessageBtn"

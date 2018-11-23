@@ -29,24 +29,28 @@
 
         <activity
             android:name=".MainActivity"
-            android:theme="@style/AppCompat">
+            android:theme="@style/AppCompat"
+            android:descendantFocusability="beforeDescendants"
+            android:focusableInTouchMode="true">
         </activity>
 
         <activity
             android:name=".SignInActivity"
-            android:theme="@style/AppCompat" />
-
-        <activity
-            android:name=".SignUpActivity2"
-            android:theme="@style/AppCompat" />
+            android:theme="@style/AppCompat"
+            android:descendantFocusability="beforeDescendants"
+            android:focusableInTouchMode="true"/>
 
         <activity
             android:name=".NewsViewerActivity"
-            android:theme="@style/AppCompat" />
+            android:theme="@style/AppCompat"
+            android:descendantFocusability="beforeDescendants"
+            android:focusableInTouchMode="true"/>
 
         <activity
             android:name=".AddNewsActivity"
-            android:theme="@style/AppCompat"/>
+            android:theme="@style/AppCompat"
+            android:descendantFocusability="beforeDescendants"
+            android:focusableInTouchMode="true"/>
 
         <provider
             android:name="android.support.v4.content.FileProvider"

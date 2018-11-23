@@ -16,14 +16,17 @@ class DataViewModel: ViewModel() {
 
     var user: MutableLiveData<User> = MutableLiveData()
     var news : MutableLiveData<ArrayList<News>> = MutableLiveData<ArrayList<News>>()
+    var membersMap: MutableLiveData<HashMap<String, User>> = MutableLiveData<HashMap<String, User>>()
+    var messages: MutableLiveData<ArrayList<Message>> = MutableLiveData<ArrayList<Message>>()
+
     private var newsListener: ListenerRegistration? = null
     private var messagesListener: ListenerRegistration? = null
     private var userListener: ListenerRegistration? = null
     private var memberListener: ListenerRegistration? = null
 
-    var membersMap: MutableLiveData<HashMap<String, User>> = MutableLiveData<HashMap<String, User>>()
-    var messages: MutableLiveData<ArrayList<Message>> = MutableLiveData<ArrayList<Message>>()
-
+    // у нас зависимость от группы пользователя,
+    // поэтому надо держать актуальным, чтобы обновлять ссылки на остальные компоненты,
+    // поэтому вызывается addUserListener() в ниже перечисленных методах
     fun getMessagesArray():MutableLiveData<ArrayList<Message>> {
         if(userListener == null) addUserListener()
         return messages
@@ -33,23 +36,6 @@ class DataViewModel: ViewModel() {
         if(memberListener == null) addUserListener()
         return membersMap
     }
-
-    fun addMembersListener() {
-        membersMap.postValue(HashMap())
-        memberListener = FirestoreUtil.getMemb { isSuccessful, members ->
-            if(isSuccessful) {
-                membersMap.postValue(members)
-            }
-        }
-    }
-    /*
-    fun getMembers(): MutableLiveData<HashMap<String, User>> {
-        FirestoreUtil.getMembers { isSuccessful, message, members ->
-            if(isSuccessful)
-                membersMap.postValue(members)
-        }
-        return membersMap
-    }*/
 
     fun getUser() : LiveData<User> {
         if(userListener == null) addUserListener()
@@ -61,21 +47,23 @@ class DataViewModel: ViewModel() {
         return news
     }
 
-    //удалить ссылку на новости
-    private fun removeListener(listener: ListenerRegistration?) {
-        if(listener != null)
-            FirestoreUtil.removeListener(listener!!)
+    //добавить слушателей на данные
+    fun addMembersListener() {
+        membersMap.postValue(HashMap())
+        memberListener = FirestoreUtil.getMemb { isSuccessful, members ->
+            if(isSuccessful) {
+                membersMap.postValue(members)
+            }
+        }
     }
 
-    //добавить ссылку на новости
-    private fun addNewsListener() {
-        news.postValue(ArrayList<News>())
-        newsListener = FirestoreUtil.addNewsListener{ isSuccessful, message, querySnapshot,
-                                                       firebaseFirestoreException ->
-                if (isSuccessful && !(querySnapshot?.isEmpty ?: true)) {
-                    news.postValue(toListNews(querySnapshot!!))
-                }
+    private fun addUserListener() {
+        userListener = FirestoreUtil.addUserListener { documentSnapshot, firebaseFirestoreException ->
+            if(firebaseFirestoreException == null && documentSnapshot?.exists() ?: false) {
+                user.postValue(documentSnapshot?.toObject(User::class.java))
+                updateListeners()
             }
+        }
     }
 
     private fun addMessagesListener() {
@@ -87,7 +75,23 @@ class DataViewModel: ViewModel() {
         }
     }
 
-    // обновить ссылкку на новости
+    private fun addNewsListener() {
+        news.postValue(ArrayList<News>())
+        newsListener = FirestoreUtil.addNewsListener{ isSuccessful, message, querySnapshot,
+                                                      firebaseFirestoreException ->
+            if (isSuccessful && !(querySnapshot?.isEmpty ?: true)) {
+                news.postValue(toListNews(querySnapshot!!))
+            }
+        }
+    }
+
+    //удалить слушатели
+    private fun removeListener(listener: ListenerRegistration?) {
+        if(listener != null)
+            FirestoreUtil.removeListener(listener!!)
+    }
+
+    // обновить все слушатели. Полезно при смене пользователем группы
     fun updateListeners() {
         removeListener(newsListener)
         removeListener(messagesListener)
@@ -97,7 +101,7 @@ class DataViewModel: ViewModel() {
         addNewsListener()
     }
 
-    //Переводит данные из объекта snapshot в список
+    //Переводит данные из объекта snapshot в список новостей
     private fun toListNews(querySnapshot: QuerySnapshot) : ArrayList<News> {
         val news: ArrayList<News> = ArrayList<News>()
         for(doc: QueryDocumentSnapshot in  querySnapshot) {
@@ -107,6 +111,7 @@ class DataViewModel: ViewModel() {
         return news
     }
 
+    //Переводит данные из объекта snapshot в список сообщений
     private fun toListMessages(querySnapshot: QuerySnapshot) : ArrayList<Message> {
         val messages: ArrayList<Message> = ArrayList<Message>()
         for(doc: QueryDocumentSnapshot in  querySnapshot) {
@@ -114,15 +119,5 @@ class DataViewModel: ViewModel() {
             messages.add(examplerMessage)
         }
         return messages
-    }
-
-    // добавит слушателя на пользователя
-    private fun addUserListener() {
-        userListener = FirestoreUtil.addUserListener { documentSnapshot, firebaseFirestoreException ->
-            if(firebaseFirestoreException == null && documentSnapshot?.exists() ?: false) {
-                user.postValue(documentSnapshot?.toObject(User::class.java))
-                updateListeners()
-            }
-        }
     }
 }

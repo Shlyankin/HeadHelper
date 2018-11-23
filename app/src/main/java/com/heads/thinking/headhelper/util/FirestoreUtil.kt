@@ -42,24 +42,6 @@ object FirestoreUtil {
         groupReference = null
         currentUser = null
     }
-/*
-    fun addMembersListener(onChange: (isSuccessful: Boolean, membersRef: ArrayList<String>?) -> Unit): ListenerRegistration? {
-        val ref = groupReference
-        if(ref != null) {
-            return ref.collection("users").addSnapshotListener {
-                querySnapshot, firebaseFirestoreException ->
-                if(firebaseFirestoreException == null) {
-                    val membersRef = ArrayList<String>().apply {
-                        for(doc in querySnapshot!!)
-                            add(doc["memberRef"].toString())
-                    }
-                    onChange(true, membersRef)
-                } else {
-                    onChange(false, null)
-                }
-            }
-        } else return null
-    }*/
 
     fun getMemb(onChange: (isSuccessful: Boolean, members: HashMap<String, User>?) -> Unit)
             : ListenerRegistration? {
@@ -80,28 +62,6 @@ object FirestoreUtil {
             return null
         }
     }
-
-    /*// переделать
-    fun getMembers(onComplete: (isSuccessful: Boolean, message: String,  members: HashMap<String, User>?) -> Unit) {
-        val ref = groupReference
-        if(ref != null) {
-            ref.collection("members").get()
-                .addOnSuccessListener {
-                    if (!it.isEmpty) {
-                        val map: HashMap<String, User> = HashMap<String, User>()
-                        for (document in it) {
-                            val memberRef: String = document["memberRef"].toString()
-                            getUser(memberRef, { isSuccessful, user ->
-                                if(isSuccessful) map.put(memberRef, user!!)
-                            })
-                        }
-                        onComplete(true, "", map)
-                    } else {
-                        onComplete(true, "Никого нет в группе", HashMap())
-                    }
-                }
-        }
-    }*/
 
     //получить любого пользователя по ссылке
     fun getUser(userPath: String, onComplete: (isSuccessful: Boolean, user: User?) -> Unit) {
@@ -222,6 +182,25 @@ object FirestoreUtil {
             .addOnFailureListener {
                 onComplete(false, it.message ?: "")
             }
+    }
+
+    //TODO нельзя удалять коллекции в firebase. Что делать?
+    fun removeGroup(onComplete: (isSuccessful:Boolean, message: String) -> Unit) {
+        getMemb { isSuccessful, members ->
+            if(isSuccessful) {
+                val data = mutableMapOf<String, Any>()
+                data["groupId"] ="start"
+                data["privilege"] = 0
+                for(usersId in members!!.keys) {
+                    firestoreInstance.collection("users").document(usersId).update(data)
+                }
+                val ref = firestoreInstance.collection("groups").document(currentUser?.groupId!!)
+                ref.collection("members")
+                onComplete(true,"")
+            } else {
+                onComplete(false, "не могу получить список пользователей")
+            }
+        }
     }
 
     // отправка новости в группу пользователя

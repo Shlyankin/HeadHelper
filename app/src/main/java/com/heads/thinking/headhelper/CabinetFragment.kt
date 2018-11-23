@@ -3,6 +3,7 @@ package com.heads.thinking.headhelper
 import android.app.Activity.RESULT_OK
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
+import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
@@ -103,8 +104,36 @@ class CabinetFragment : Fragment(), View.OnClickListener {
     override fun onClick(view: View?) {
         when(view!!.id) {
             R.id.changeGroupBtn -> {
-                val dialogFragment = ChangeGroupDialog()
-                dialogFragment.show(this.childFragmentManager, "changeGroup")
+                val user = FirestoreUtil.currentUser
+                if(user != null) {
+                    if (user.privilege < 2) {
+                        val dialogFragment = ChangeGroupDialog()
+                        dialogFragment.show(this.childFragmentManager, "changeGroup")
+                    } else {
+                        val moderators = membersRecyclerViewAdapter.getModeratorsList()
+                        val moderatorsNames = Array<String>(moderators.size, {
+                            moderators[it].name
+                        })
+                        if(moderators.size > 0) {
+                            val builder = AlertDialog.Builder(this.context!!)
+                            builder.setTitle("Выберите нового админа")
+                            builder.setItems(moderatorsNames, { dialogInterface: DialogInterface, position: Int ->
+                                FirestoreUtil.updateMembersPrivileges(moderators[position].id, 2, { isSuccessful, message ->
+                                    if (isSuccessful) {
+                                        val dialogFragment = ChangeGroupDialog()
+                                        dialogFragment.show(this.childFragmentManager, "changeGroup")
+                                    }
+                                })
+                            })
+                            builder.setNegativeButton("Отмена", null)
+                            builder.setCancelable(false)
+                            builder.create().show()
+                        } else {
+                            val dialogFragment = ChangeGroupDialog()
+                            dialogFragment.show(this.childFragmentManager, "changeGroup")
+                        }
+                    }
+                }
             }
             R.id.changePasswordBtn -> {
                 val dialogFragment = ChangePasswordDialog()
