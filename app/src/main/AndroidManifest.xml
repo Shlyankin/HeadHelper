@@ -3,22 +3,24 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.heads.thinking.headhelper">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
 
     <application
-        android:configChanges="keyboardHidden|orientation|screenSize"
-        android:windowSoftInputMode="adjustPan|adjustResize|stateHidden"
         android:name=".App"
         android:allowBackup="true"
+        android:appComponentFactory="whateverString"
+        android:configChanges="keyboardHidden|orientation|screenSize"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppCompat">
+        android:theme="@style/AppCompat"
+        android:windowSoftInputMode="adjustPan|adjustResize|stateHidden"
+        tools:replace="android:appComponentFactory">
         <activity android:name=".SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,31 +28,26 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".MainActivity"
-            android:theme="@style/AppCompat"
             android:descendantFocusability="beforeDescendants"
-            android:focusableInTouchMode="true">
-        </activity>
-
+            android:focusableInTouchMode="true"
+            android:theme="@style/AppCompat"></activity>
         <activity
             android:name=".SignInActivity"
-            android:theme="@style/AppCompat"
             android:descendantFocusability="beforeDescendants"
-            android:focusableInTouchMode="true"/>
-
+            android:focusableInTouchMode="true"
+            android:theme="@style/AppCompat" />
         <activity
             android:name=".NewsViewerActivity"
-            android:theme="@style/AppCompat"
             android:descendantFocusability="beforeDescendants"
-            android:focusableInTouchMode="true"/>
-
+            android:focusableInTouchMode="true"
+            android:theme="@style/AppCompat" />
         <activity
             android:name=".AddNewsActivity"
-            android:theme="@style/AppCompat"
             android:descendantFocusability="beforeDescendants"
-            android:focusableInTouchMode="true"/>
+            android:focusableInTouchMode="true"
+            android:theme="@style/AppCompat" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -62,8 +59,7 @@
                 android:resource="@xml/provider_paths" />
         </provider>
 
+        <activity android:name=".PhotoViewerActivity"></activity>
     </application>
-
-
 
 </manifest>

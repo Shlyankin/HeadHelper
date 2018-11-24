@@ -3,7 +3,9 @@ package com.heads.thinking.headhelper
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
+import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -19,6 +21,7 @@ class NewsViewerActivity : AppCompatActivity(), View.OnClickListener {
     lateinit var tittleTV: TextView
     lateinit var textTV: TextView
     lateinit var authorTV: TextView
+    lateinit var editFab: FloatingActionButton
     lateinit var news: News
     lateinit var authorAvatarIV: ImageView
 
@@ -31,6 +34,12 @@ class NewsViewerActivity : AppCompatActivity(), View.OnClickListener {
         textTV = findViewById(R.id.textTV)
         authorTV = findViewById(R.id.authorTV)
         authorAvatarIV = findViewById(R.id.authorAvatarIV)
+        editFab = findViewById(R.id.editFab)
+
+        if(FirestoreUtil.currentUser?.privilege ?: 0 > 0)
+            editFab.show()
+
+        imageView.setOnClickListener(this)
 
         news = intent.getParcelableExtra("news")
         tittleTV.text = news.tittle
@@ -40,9 +49,13 @@ class NewsViewerActivity : AppCompatActivity(), View.OnClickListener {
                 if(isSuccessful) {
                     authorTV.text = "Автор: " + user!!.name
                     if(user.profilePicturePath != null)
-                        GlideApp.with(this)
-                                .load(StorageUtil.pathToReference(user.profilePicturePath))
-                                .into(authorAvatarIV)
+                        try {
+                            GlideApp.with(this)
+                                    .load(StorageUtil.pathToReference(user.profilePicturePath))
+                                    .into(authorAvatarIV)
+                        } catch (exc: KotlinNullPointerException) {
+                            Log.e("GlideError", "AuthorImage loading error " + exc.message)
+                        }
                 } else {
                     authorTV.text = "Автор: Неизвестно"
                 }
@@ -53,9 +66,13 @@ class NewsViewerActivity : AppCompatActivity(), View.OnClickListener {
     override fun onStart() {
         super.onStart()
         if(news.picturePath != null)
-            GlideApp.with(this)
-                    .load(StorageUtil.pathToReference(news.picturePath!!))
-                    .into(imageView)
+            try {
+                GlideApp.with(this)
+                        .load(StorageUtil.pathToReference(news.picturePath ?: ""))
+                        .into(imageView)
+            } catch(exc: KotlinNullPointerException) {
+                Log.e("GlideError", "MainImage loading error " + exc.message)
+            }
     }
 
     override fun onClick(view: View?) {
@@ -69,7 +86,11 @@ class NewsViewerActivity : AppCompatActivity(), View.OnClickListener {
                 })
             }
             R.id.mainIV -> {
-                //TODO start imageViewer
+                if(news.picturePath != null) {
+                    startActivity(Intent(this, PhotoViewerActivity::class.java).apply {
+                        putExtra("picturePath", news.picturePath)
+                    })
+                }
             }
         }
     }

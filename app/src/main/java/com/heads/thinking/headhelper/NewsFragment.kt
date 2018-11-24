@@ -59,7 +59,7 @@ class NewsFragment : Fragment(), View.OnClickListener {
         super.onStart()
         dataViewModel.getUser().observe(this.activity!!, Observer<User> { user: User? ->
             if(user != null && user.privilege != 0) {
-                addNewsBtn.visibility = View.VISIBLE
+                addNewsBtn.show()
             }
         })
         dataViewModel.getNews().observe(this.activity!!, Observer<ArrayList<News>> { changedNews ->

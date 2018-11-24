@@ -41,12 +41,13 @@
 
             <ImageButton
                 android:id="@+id/sendMessageBtn"
-                android:layout_width="wrap_content"
+                android:layout_width="55dp"
                 android:layout_height="45dp"
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
-                android:scaleType="centerInside"
-                android:src="@drawable/icon_send" />
+                android:rotation="270"
+                android:scaleType="fitCenter"
+                android:src="@android:drawable/ic_menu_send" />
 
         </LinearLayout>
 

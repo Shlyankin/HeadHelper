@@ -1,6 +1,7 @@
 package com.heads.thinking.headhelper.adapters
 
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -74,9 +75,13 @@ class MembersRecyclerViewAdapter(var members: ArrayList<User>) : RecyclerView.Ad
 
             usernameTV.setText(user.name)
             if(user.profilePicturePath != null) {
+                try {
                 GlideApp.with(membersAvatar)
                         .load(StorageUtil.pathToReference(user.profilePicturePath))
                         .into(membersAvatar)
+                } catch(exc: KotlinNullPointerException) {
+                    Log.e("GlideError", "ProfilePhoto loading error " + exc.message)
+                }
             }
 
             if(FirestoreUtil.currentUser?.privilege ?: 0 == 2) {

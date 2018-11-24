@@ -2,6 +2,7 @@ package com.heads.thinking.headhelper.adapters
 
 import android.support.v7.widget.CardView
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +16,7 @@ import com.heads.thinking.headhelper.models.User
 import com.heads.thinking.headhelper.util.FirestoreUtil
 import com.heads.thinking.headhelper.util.StorageUtil
 import de.hdodenhof.circleimageview.CircleImageView
+import java.lang.NullPointerException
 
 class ChatRecyclerAdapter(var messages: ArrayList<Message>, var members: HashMap<String, User>):
         RecyclerView.Adapter<ChatRecyclerAdapter.ViewHolder>() {
@@ -58,9 +60,12 @@ class ChatRecyclerAdapter(var messages: ArrayList<Message>, var members: HashMap
             if(user != null) {
                 usernameTV.text = user.name
                 if (user.profilePicturePath != null)
-                    GlideApp.with(circleImageView)
-                            .load(StorageUtil.pathToReference(user.profilePicturePath))
-                            .into(circleImageView)
+                    try {
+                        GlideApp.with(circleImageView)
+                                .load(StorageUtil.pathToReference(user.profilePicturePath))
+                                .into(circleImageView)
+                    } catch(exc: KotlinNullPointerException) {
+                        Log.e("GlideError", "ProfilePhoto loading error " + exc.message)}
                 if(user.id == FirestoreUtil.currentUser?.id) {
                     val layoutParams: FrameLayout.LayoutParams = cardView.layoutParams as FrameLayout.LayoutParams
                     layoutParams.gravity = Gravity.LEFT

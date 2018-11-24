@@ -6,6 +6,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.support.v7.widget.CardView
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -81,14 +82,18 @@ class NewsRecyclerAdapter(val context: Context, var list:ArrayList<News>, val da
             //заполняем атрибуты view
             itemHeader.text = news.tittle
             dateTV.text = SimpleDateFormat.getInstance().format(news.date)
-            if(news.picturePath != null)
-                GlideApp.with(imageView)
-                      .load(StorageUtil.pathToReference(news.picturePath))
-                      .into(imageView)
-            else {
-                GlideApp.with(imageView)
-                        .load(R.drawable.logo)
-                        .into(imageView)
+            try {
+                if (news.picturePath != null)
+                    GlideApp.with(imageView)
+                            .load(StorageUtil.pathToReference(news.picturePath))
+                            .into(imageView)
+                else {
+                    GlideApp.with(imageView)
+                            .load(R.drawable.logo)
+                            .into(imageView)
+                }
+            } catch (exc: KotlinNullPointerException) {
+                Log.e("GlideError", "NewsImage loading error " + exc.message)
             }
         }
     }

@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
@@ -109,9 +110,13 @@ class AddNewsActivity: AppCompatActivity(), View.OnClickListener {
             if(textET.text.isEmpty()) textET.setText(news!!.text)
             if(news!!.picturePath != null) {
                 urlNewsImage = news!!.picturePath!!
-                GlideApp.with(this)
-                        .load(StorageUtil.pathToReference(news!!.picturePath!!))
-                        .into(imageView)
+                try {
+                    GlideApp.with(this)
+                            .load(StorageUtil.pathToReference(news!!.picturePath!!))
+                            .into(imageView)
+                } catch(exc: KotlinNullPointerException) {
+                    Log.e("GlideError", "AddNews loading error " + exc.message)
+                }
             }
         }
 
@@ -119,9 +124,13 @@ class AddNewsActivity: AppCompatActivity(), View.OnClickListener {
             urlNewsImage = viewModel.urlNewsImage
         selectedImageBytes = viewModel.byteArray
         if (selectedImageBytes != null)
-            GlideApp.with(this)
-                    .load(selectedImageBytes)
-                    .into(imageView)
+            try {
+                GlideApp.with(this)
+                        .load(selectedImageBytes)
+                        .into(imageView)
+            } catch(exc: KotlinNullPointerException) {
+                Log.e("GlideError", "AddNews loading error " + exc.message)
+            }
 
         uploadImageTask = viewModel.uploadTask
         startUpload(uploadImageTask)
@@ -171,9 +180,13 @@ class AddNewsActivity: AppCompatActivity(), View.OnClickListener {
             selectedImageBmp.compress(Bitmap.CompressFormat.JPEG, 90, outputStream)
             selectedImageBytes = outputStream.toByteArray()
             viewModel.byteArray = selectedImageBytes
-            GlideApp.with(this)
-                    .load(selectedImageBytes)
-                    .into(imageView)
+            try {
+                GlideApp.with(this)
+                        .load(selectedImageBytes)
+                        .into(imageView)
+            } catch(exc: KotlinNullPointerException) {
+                Log.e("GlideError", "AddNews loading error " + exc.message)
+            }
 
             uploadImageTask = StorageUtil.uploadNewsImage(selectedImageBytes!!, { urlImage:String ->
                 urlNewsImage = urlImage
@@ -199,12 +212,12 @@ class AddNewsActivity: AppCompatActivity(), View.OnClickListener {
     fun startUpload(uploadImageTask: UploadTask?) {
         if(uploadImageTask != null && uploadImageTask.isInProgress) {
             uploadProgressBar.visibility = View.VISIBLE
-            addNewsFab.visibility = View.INVISIBLE
+            addNewsFab.hide()
             uploadImageTask.addOnProgressListener(object : OnProgressListener<UploadTask.TaskSnapshot> {
                 override fun onProgress(taskSnapshot: UploadTask.TaskSnapshot?) {
                     if (taskSnapshot?.bytesTransferred == taskSnapshot?.totalByteCount) {
                         uploadProgressBar.visibility = View.GONE
-                        addNewsFab.visibility = View.VISIBLE
+                        addNewsFab.show()
                     }
                 }
             })
@@ -215,7 +228,7 @@ class AddNewsActivity: AppCompatActivity(), View.OnClickListener {
         if(uploadImageTask != null) {
             uploadImageTask.cancel()
             uploadProgressBar.visibility = View.GONE
-            addNewsFab.visibility = View.VISIBLE
+            addNewsFab.show()
             imageView.setImageDrawable(null)
         }
     }

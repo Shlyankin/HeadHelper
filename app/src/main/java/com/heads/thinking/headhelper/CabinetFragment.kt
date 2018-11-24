@@ -115,19 +115,18 @@ class CabinetFragment : Fragment(), View.OnClickListener {
                             moderators[it].name
                         })
                         if(moderators.size > 0) {
-                            val builder = AlertDialog.Builder(this.context!!)
-                            builder.setTitle("Выберите нового админа")
-                            builder.setItems(moderatorsNames, { dialogInterface: DialogInterface, position: Int ->
-                                FirestoreUtil.updateMembersPrivileges(moderators[position].id, 2, { isSuccessful, message ->
-                                    if (isSuccessful) {
-                                        val dialogFragment = ChangeGroupDialog()
-                                        dialogFragment.show(this.childFragmentManager, "changeGroup")
-                                    }
+                            AlertDialog.Builder(this.context!!).setTitle("Выберите нового админа")
+                                .setItems(moderatorsNames, { dialogInterface: DialogInterface, position: Int ->
+                                    FirestoreUtil.updateMembersPrivileges(moderators[position].id, 2, { isSuccessful, message ->
+                                        if (isSuccessful) {
+                                            val dialogFragment = ChangeGroupDialog()
+                                            dialogFragment.show(this.childFragmentManager, "changeGroup")
+                                        }
+                                    })
                                 })
-                            })
-                            builder.setNegativeButton("Отмена", null)
-                            builder.setCancelable(false)
-                            builder.create().show()
+                                .setNegativeButton("Отмена", null)
+                                .setCancelable(false)
+                                .create().show()
                         } else {
                             val dialogFragment = ChangeGroupDialog()
                             dialogFragment.show(this.childFragmentManager, "changeGroup")
