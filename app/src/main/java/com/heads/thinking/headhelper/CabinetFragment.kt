@@ -35,6 +35,7 @@ import java.io.ByteArrayOutputStream
 
 class CabinetFragment : Fragment(), View.OnClickListener {
 
+    private lateinit var progressBar: ProgressBar
     private lateinit var avatarIV: ImageView
     private lateinit var usersNameTV: TextView
     private lateinit var groupIdTV: TextView
@@ -56,6 +57,7 @@ class CabinetFragment : Fragment(), View.OnClickListener {
         avatarIV = view.findViewById(R.id.avatarIV)
         usersNameTV = view.findViewById(R.id.usernameTV)
         groupIdTV = view.findViewById(R.id.groupIdTV)
+        progressBar = view.findViewById(R.id.progressBar)
         //end init views
 
         membersCardView = view.findViewById(R.id.membersCardView)
@@ -79,6 +81,7 @@ class CabinetFragment : Fragment(), View.OnClickListener {
         dataViewModel.getUser().observe(this.activity!!, object : Observer<User> {
             override fun onChanged(changedUser: User?) {
                 if (changedUser != null) {
+                    progressBar.visibility = View.GONE
                     usersNameTV.text = changedUser.name
                     groupIdTV.text = changedUser.groupId ?: ""
                     if (changedUser.profilePicturePath != null && this@CabinetFragment.activity != null)
@@ -114,8 +117,8 @@ class CabinetFragment : Fragment(), View.OnClickListener {
                         val moderatorsNames = Array<String>(moderators.size, {
                             moderators[it].name
                         })
-                        if(moderators.size > 0) {
-                            AlertDialog.Builder(this.context!!).setTitle("Выберите нового админа")
+                        if(membersRecyclerViewAdapter.members.size > 0) {
+                            AlertDialog.Builder(this.context!!).setTitle("Выберите нового админа из ваших модераторов")
                                 .setItems(moderatorsNames, { dialogInterface: DialogInterface, position: Int ->
                                     FirestoreUtil.updateMembersPrivileges(moderators[position].id, 2, { isSuccessful, message ->
                                         if (isSuccessful) {

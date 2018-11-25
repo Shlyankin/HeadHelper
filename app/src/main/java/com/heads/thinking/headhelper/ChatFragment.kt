@@ -10,10 +10,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageButton
-import android.widget.Toast
+import android.widget.*
 import com.heads.thinking.headhelper.adapters.ChatRecyclerAdapter
 import com.heads.thinking.headhelper.models.Message
 import com.heads.thinking.headhelper.models.User
@@ -30,6 +27,7 @@ class ChatFragment : Fragment(), View.OnClickListener {
     lateinit var sendMessageButton: ImageButton
     lateinit var chatRecyclerView: RecyclerView
     lateinit var chatRecyclerAdapter: ChatRecyclerAdapter
+    lateinit var progressBar: ProgressBar
 
     lateinit var dataViewModel: DataViewModel
 
@@ -59,6 +57,7 @@ class ChatFragment : Fragment(), View.OnClickListener {
         sendMessageButton = view.findViewById(R.id.sendMessageBtn)
         editMessageET = view.findViewById(R.id.editMessageET)
         chatRecyclerView = view.findViewById(R.id.chatRecyclerView)
+        progressBar = view.findViewById(R.id.progressBar)
 
         sendMessageButton.setOnClickListener(this)
 
@@ -84,6 +83,7 @@ class ChatFragment : Fragment(), View.OnClickListener {
         dataViewModel.getMessagesArray().observe(this.activity!!, object : Observer<ArrayList<Message>> {
             override fun onChanged(messages: ArrayList<Message>?) {
                 if (messages != null) {
+                    progressBar.visibility = View.GONE
                     chatRecyclerAdapter.updateMessages(messages)
                     chatRecyclerAdapter.notifyDataSetChanged()
                     if(chatRecyclerView.verticalScrollbarPosition == chatRecyclerAdapter.itemCount - 2 || chatRecyclerView.verticalScrollbarPosition == 0) // check this

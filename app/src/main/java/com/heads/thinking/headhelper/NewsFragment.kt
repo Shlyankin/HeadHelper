@@ -11,14 +11,17 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import android.widget.Toast
 import com.heads.thinking.headhelper.adapters.NewsRecyclerAdapter
 import com.heads.thinking.headhelper.models.News
 import com.heads.thinking.headhelper.models.User
 import com.heads.thinking.headhelper.mvvm.DataViewModel
+import kotlinx.android.synthetic.main.fragment_chat.*
 
 class NewsFragment : Fragment(), View.OnClickListener {
 
+    lateinit var progressBar: ProgressBar
     lateinit var dataViewModel: DataViewModel
     lateinit var addNewsBtn: FloatingActionButton
     lateinit var newsRecyclerView: RecyclerView
@@ -45,6 +48,7 @@ class NewsFragment : Fragment(), View.OnClickListener {
 
         dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
 
+        progressBar = view.findViewById(R.id.progressBar)
         newsRecyclerView = view.findViewById(R.id.newsRecyclerView)
         newsRecyclerView.layoutManager = LinearLayoutManager(App.instance?.applicationContext, LinearLayoutManager.VERTICAL, false)
         newsRecyclerView.hasFixedSize()
@@ -64,6 +68,7 @@ class NewsFragment : Fragment(), View.OnClickListener {
         })
         dataViewModel.getNews().observe(this.activity!!, Observer<ArrayList<News>> { changedNews ->
             if(changedNews != null) {
+                progressBar.visibility = View.GONE
                 newsList = changedNews
                 adapterNewsRecyclerAdapter.list = newsList
                 adapterNewsRecyclerAdapter.notifyDataSetChanged()
