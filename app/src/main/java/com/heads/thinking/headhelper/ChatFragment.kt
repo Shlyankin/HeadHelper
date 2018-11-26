@@ -16,6 +16,7 @@ import com.heads.thinking.headhelper.models.Message
 import com.heads.thinking.headhelper.models.User
 import com.heads.thinking.headhelper.mvvm.DataViewModel
 import com.heads.thinking.headhelper.util.FirestoreUtil
+import kotlinx.coroutines.CoroutineStart
 import java.time.Instant
 import java.util.*
 import kotlin.collections.ArrayList
@@ -82,8 +83,8 @@ class ChatFragment : Fragment(), View.OnClickListener {
         })
         dataViewModel.getMessagesArray().observe(this.activity!!, object : Observer<ArrayList<Message>> {
             override fun onChanged(messages: ArrayList<Message>?) {
+                progressBar.visibility = View.GONE
                 if (messages != null) {
-                    progressBar.visibility = View.GONE
                     chatRecyclerAdapter.updateMessages(messages)
                     chatRecyclerAdapter.notifyDataSetChanged()
                     if(chatRecyclerView.verticalScrollbarPosition == chatRecyclerAdapter.itemCount - 2 || chatRecyclerView.verticalScrollbarPosition == 0) // check this

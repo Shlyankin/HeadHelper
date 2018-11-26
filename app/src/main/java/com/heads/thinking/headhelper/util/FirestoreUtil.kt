@@ -3,7 +3,6 @@ package com.heads.thinking.headhelper.util
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.*
-import com.google.firebase.firestore.local.QueryData
 import com.heads.thinking.headhelper.models.Message
 import com.heads.thinking.headhelper.models.News
 import com.heads.thinking.headhelper.models.User
@@ -20,9 +19,11 @@ object FirestoreUtil {
         get() = firestoreInstance.document("users/${FirebaseAuth.getInstance().currentUser?.uid
                 ?: throw NullPointerException("UID is null.")}")
 
-    //листенер текущего пользователя
+    // слушатель текущего пользователя
     var userListener: ListenerRegistration? = null
 
+    // метод, который НЕОБХОДИМО вызвать при авторизации пользователя
+    // инициализирует слушатели и обновляет ссылки
     fun userSignIn() {
         if(userListener == null) {
             userListener = currentUserDocRef.addSnapshotListener { documentSnapshot: DocumentSnapshot?, firebaseFirestoreException: FirebaseFirestoreException? ->
@@ -35,7 +36,8 @@ object FirestoreUtil {
         }
     }
 
-    // действи, которые НЕОБХОДИМО выполнить при выходе пользователя
+    // метод, который НЕОБХОДИМО вызвать при выходе пользователя из аккаунта
+    // удаляет все слушатели на текщуего пользователя и стирает некоторые его данные сессии
     fun userSignOut() {
         if(userListener != null)
             removeListener(userListener!!)
@@ -44,6 +46,7 @@ object FirestoreUtil {
         currentUser = null
     }
 
+    // возвращает Map всех пользователей группы, где ключ - User.id, а также устанавливает слушатель
     fun getMemb(onChange: (isSuccessful: Boolean, members: HashMap<String, User>?) -> Unit)
             : ListenerRegistration? {
         val currUser = currentUser
@@ -64,9 +67,9 @@ object FirestoreUtil {
         }
     }
 
-    //получить любого пользователя по ссылке
-    fun getUser(userPath: String, onComplete: (isSuccessful: Boolean, user: User?) -> Unit) {
-        firestoreInstance.collection("users").document(userPath).get()
+    //получить данные любого пользователя по url
+    fun getUser(usersUrl: String, onComplete: (isSuccessful: Boolean, user: User?) -> Unit) {
+        firestoreInstance.collection("users").document(usersUrl).get()
                 .addOnSuccessListener {
                     if(it.exists())
                         onComplete(it.exists(), it.toObject(User::class.java)!!)
@@ -80,8 +83,8 @@ object FirestoreUtil {
     }
 
 
-    // добавить слушателя для пользователя
-    fun addUserListener(onChange: (documentSnapshot: DocumentSnapshot?,
+    // добавить слушателя для текущего пользователя
+    fun addCurrentUserListener(onChange: (documentSnapshot: DocumentSnapshot?,
                                    firebaseFirestoreException: FirebaseFirestoreException?) -> Unit) : ListenerRegistration {
         return currentUserDocRef.addSnapshotListener{ documentSnapshot: DocumentSnapshot?,
                                                firebaseFirestoreException: FirebaseFirestoreException? ->
@@ -94,7 +97,7 @@ object FirestoreUtil {
         currentUserDocRef.get().addOnSuccessListener { documentSnapshot ->
             if (!documentSnapshot.exists()) {
                 val newUser = User(FirebaseAuth.getInstance().currentUser?.uid.toString(), FirebaseAuth.getInstance().currentUser?.displayName ?: "",
-                        0, null, mutableListOf(), null)
+                        0, null, mutableListOf(), "start")
                 currentUserDocRef.set(newUser).addOnSuccessListener {
                     onComplete()
                 }
@@ -152,6 +155,8 @@ object FirestoreUtil {
                     if(it.exception is FirebaseNetworkException) {
                         onComplete(false, "Отсутствует подключение к интрнету")
                     } else {
+                        firestoreInstance.collection("groups").document(newGroupId)
+                                .set(mapOf(Pair("id", newGroupId)))
                         updateCurrentUserData(privilege = 2, groupId = newGroupId)
                         onComplete(true, "Группа создана")
                     }
@@ -170,14 +175,19 @@ object FirestoreUtil {
         }
         firestoreInstance.collection("groups")
             .document(newGroupId).get().addOnCompleteListener {
-                if(it.isSuccessful && it.getResult()?.exists() ?: false) {
-                    updateCurrentUserData(privilege = 0, groupId = newGroupId)
-                    onComplete(true, "Вы сменили группу")
-                } else {
-                    if(it.exception?.message == "Failed to get document because the client is offline.") {
-                        onComplete(false, "Отсутствует подключение к интрнету")
-                    } else
+
+                if(it.isSuccessful) {
+                    val snapshot: DocumentSnapshot = it.result!!
+                    if(snapshot.exists()) {
+                        updateCurrentUserData(privilege = 0, groupId = newGroupId)
+                        onComplete(true, "Вы сменили группу")
+                    }  else
                         onComplete(false, "Группы с заданным номером не существует")
+                } else {
+                    if(it.exception?.message == "Failed to get document because the client is offline.")
+                        onComplete(false, "Отсутствует подключение к интрнету")
+                    else
+                        onComplete(false, "Error " + it.exception?.message )
                 }
             }
             .addOnFailureListener {

@@ -9,5 +9,6 @@ data class Message(
         val date: Date?,
         val picturePath: String?
 ) {
+    //конструктор по умолчанию для firebase
     constructor() : this("", "", "", null, null)
 }

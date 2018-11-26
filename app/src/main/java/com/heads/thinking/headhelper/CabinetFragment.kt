@@ -22,13 +22,12 @@ import com.firebase.ui.auth.AuthUI
 import com.heads.thinking.headhelper.adapters.MembersRecyclerViewAdapter
 import com.heads.thinking.headhelper.dialogs.ChangeGroupDialog
 import com.heads.thinking.headhelper.dialogs.ChangePasswordDialog
-import com.heads.thinking.headhelper.glide.GlideApp
+import com.heads.thinking.headhelper.glide.loadImage
 import com.heads.thinking.headhelper.models.User
 import com.heads.thinking.headhelper.mvvm.DataViewModel
 import com.heads.thinking.headhelper.util.CustomImageManager
 import com.heads.thinking.headhelper.util.StorageUtil
 import com.heads.thinking.headhelper.util.FirestoreUtil
-import kotlinx.android.synthetic.*
 
 import java.io.ByteArrayOutputStream
 
@@ -85,9 +84,8 @@ class CabinetFragment : Fragment(), View.OnClickListener {
                     usersNameTV.text = changedUser.name
                     groupIdTV.text = changedUser.groupId ?: ""
                     if (changedUser.profilePicturePath != null && this@CabinetFragment.activity != null)
-                        GlideApp.with(this@CabinetFragment)
-                                .load(StorageUtil.pathToReference(changedUser.profilePicturePath))
-                                .into(avatarIV)
+                        loadImage(StorageUtil.pathToReference(changedUser.profilePicturePath),
+                                this@CabinetFragment.context, avatarIV)
                 }
             }
         })
@@ -117,7 +115,7 @@ class CabinetFragment : Fragment(), View.OnClickListener {
                         val moderatorsNames = Array<String>(moderators.size, {
                             moderators[it].name
                         })
-                        if(membersRecyclerViewAdapter.members.size > 0) {
+                        if(membersRecyclerViewAdapter.members.size > 1) {
                             AlertDialog.Builder(this.context!!).setTitle("Выберите нового админа из ваших модераторов")
                                 .setItems(moderatorsNames, { dialogInterface: DialogInterface, position: Int ->
                                     FirestoreUtil.updateMembersPrivileges(moderators[position].id, 2, { isSuccessful, message ->

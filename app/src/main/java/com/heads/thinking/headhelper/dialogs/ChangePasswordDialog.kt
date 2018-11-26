@@ -52,13 +52,13 @@ class ChangePasswordDialog : DialogFragment() {
                             if (task.isSuccessful) {
                                 Toast.makeText(App.instance, "Пароль изменен", Toast.LENGTH_SHORT).show()
                             } else {
-                                Toast.makeText(App.instance, "Ошибка. Пароль не изменен", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(App.instance, "Ошибка. Пароль не изменен" + task.exception?.message, Toast.LENGTH_SHORT).show()
                             }
                         }
                     } else {
-                        when(task.exception!!) {
+                        when(task.exception) {
                             is FirebaseAuthInvalidCredentialsException -> Toast.makeText(App.instance, "Вы неправильно ввели старый пароль", Toast.LENGTH_LONG).show()
-                            else -> Toast.makeText(App.instance, "Ошибка: " + task.exception!!.message.toString(), Toast.LENGTH_LONG).show()
+                            else -> Toast.makeText(App.instance, "Ошибка: " + task.exception?.message.toString(), Toast.LENGTH_LONG).show()
                         }
                     }
                 }

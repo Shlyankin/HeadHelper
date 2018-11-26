@@ -54,12 +54,4 @@ class MainActivity : AppCompatActivity() {
         //TODO предложить пользователю вступить в группу
         //checkUser()
     }
-
-    /*private fun checkUser() {
-        val user = FirestoreUtil.currentUser
-            if (user != null && user.groupId == null) {
-                Toast.makeText(this,"Вы не состоите в группе\n" +
-                        "Зайдите в кабинет и поменяйте группе", Toast.LENGTH_SHORT).show()
-            }
-    }*/
 }

@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ChatFragment">
+    tools:context=".ChatFragment"
+    android:focusableInTouchMode="true">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/chatRecyclerView"
@@ -53,7 +54,8 @@
                 android:ems="10"
                 android:hint="введите сообщение"
                 android:inputType="textMultiLine"
-                android:imeOptions="flagNoExtractUi" />
+                android:imeOptions="flagNoExtractUi"
+                android:focusableInTouchMode="true"/>
 
             <ImageButton
                 android:id="@+id/sendMessageBtn"

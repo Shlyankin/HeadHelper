@@ -4,25 +4,26 @@ import android.app.Activity
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.Rect
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.ProgressBar
-import android.widget.Toast
+import android.widget.*
 import com.google.firebase.storage.OnProgressListener
 import com.google.firebase.storage.UploadTask
-import com.heads.thinking.headhelper.glide.GlideApp
+import com.heads.thinking.headhelper.glide.loadImage
 import com.heads.thinking.headhelper.models.News
 import com.heads.thinking.headhelper.mvvm.AddNewsActivityViewModel
 import com.heads.thinking.headhelper.util.CustomImageManager
 import com.heads.thinking.headhelper.util.FirestoreUtil
 import com.heads.thinking.headhelper.util.StorageUtil
+import kotlinx.android.synthetic.main.activity_add_news.*
 import kotlinx.android.synthetic.main.fragment_news.*
+import org.jetbrains.anko.contentView
 import java.io.ByteArrayOutputStream
 import java.util.*
 
@@ -36,7 +37,70 @@ class AddNewsActivity: AppCompatActivity(), View.OnClickListener {
     private lateinit var headerET: EditText
     private lateinit var imageView: ImageView
     private lateinit var uploadProgressBar: ProgressBar
-    lateinit var viewModel : AddNewsActivityViewModel
+    private lateinit var viewModel : AddNewsActivityViewModel
+
+    private lateinit var addNewsFab: FloatingActionButton
+    private lateinit var addImageFab: FloatingActionButton
+    private lateinit var backFab: FloatingActionButton
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_add_news)
+
+        headerET = findViewById(R.id.headerET)
+        textET = findViewById(R.id.textET)
+        imageView = findViewById(R.id.imageView)
+        uploadProgressBar = findViewById(R.id.uploadProgressBar)
+        addNewsFab = findViewById(R.id.addNewsFab)
+        addImageFab = findViewById(R.id.addImageFab)
+        backFab = findViewById(R.id.backFab)
+
+        addImageFab.setOnClickListener(this)
+        backFab.setOnClickListener(this)
+        addNewsFab.setOnClickListener(this)
+
+        viewModel = ViewModelProviders.of(this).get(AddNewsActivityViewModel::class.java)
+
+        news = intent.getParcelableExtra("news")
+
+        if(news != null) {
+            if(headerET.text.toString().isEmpty()) headerET.setText(news!!.tittle)
+            if(textET.text.isEmpty()) textET.setText(news!!.text)
+            if(news!!.picturePath != null) {
+                urlNewsImage = news!!.picturePath!!
+                loadImage(StorageUtil.pathToReference(news!!.picturePath!!), this, imageView)
+            }
+        }
+
+        if(viewModel.urlNewsImage != null)
+            urlNewsImage = viewModel.urlNewsImage
+        selectedImageBytes = viewModel.byteArray
+        if (selectedImageBytes != null)
+            loadImage(selectedImageBytes, this, imageView)
+        uploadImageTask = viewModel.uploadTask
+        startUpload(uploadImageTask)
+
+        contentView?.viewTreeObserver?.addOnGlobalLayoutListener {
+            val r: Rect = Rect()
+            contentView!!.getWindowVisibleDisplayFrame(r)
+            val screenHeight: Int = contentView!!.rootView.height
+            val keyPadHeight = screenHeight - r.bottom
+
+            if(keyPadHeight > screenHeight * 0.15) {
+                // 0.15 to determinate keypad height
+                //keyboard is opened
+                addNewsFab.hide()
+                addImageFab.hide()
+                backFab.hide()
+            } else {
+                //keyboard is closed
+
+                addNewsFab.show()
+                addImageFab.show()
+                backFab.show()
+            }
+        }
+    }
 
     override fun onClick(view: View?) {
         when (view!!.id) {
@@ -91,51 +155,6 @@ class AddNewsActivity: AppCompatActivity(), View.OnClickListener {
             }
         }
     }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_add_news)
-
-        headerET = findViewById(R.id.headerET)
-        textET = findViewById(R.id.textET)
-        imageView = findViewById(R.id.imageView)
-        uploadProgressBar = findViewById(R.id.uploadProgressBar)
-
-        viewModel = ViewModelProviders.of(this).get(AddNewsActivityViewModel::class.java)
-
-        news = intent.getParcelableExtra("news")
-
-        if(news != null) {
-            if(headerET.text.toString().isEmpty()) headerET.setText(news!!.tittle)
-            if(textET.text.isEmpty()) textET.setText(news!!.text)
-            if(news!!.picturePath != null) {
-                urlNewsImage = news!!.picturePath!!
-                try {
-                    GlideApp.with(this)
-                            .load(StorageUtil.pathToReference(news!!.picturePath!!))
-                            .into(imageView)
-                } catch(exc: KotlinNullPointerException) {
-                    Log.e("GlideError", "AddNews loading error " + exc.message)
-                }
-            }
-        }
-
-        if(viewModel.urlNewsImage != null)
-            urlNewsImage = viewModel.urlNewsImage
-        selectedImageBytes = viewModel.byteArray
-        if (selectedImageBytes != null)
-            try {
-                GlideApp.with(this)
-                        .load(selectedImageBytes)
-                        .into(imageView)
-            } catch(exc: KotlinNullPointerException) {
-                Log.e("GlideError", "AddNews loading error " + exc.message)
-            }
-
-        uploadImageTask = viewModel.uploadTask
-        startUpload(uploadImageTask)
-    }
-
     override fun onBackPressed() {
         if (uploadImageTask == null) super.onBackPressed()
         else {
@@ -180,13 +199,7 @@ class AddNewsActivity: AppCompatActivity(), View.OnClickListener {
             selectedImageBmp.compress(Bitmap.CompressFormat.JPEG, 90, outputStream)
             selectedImageBytes = outputStream.toByteArray()
             viewModel.byteArray = selectedImageBytes
-            try {
-                GlideApp.with(this)
-                        .load(selectedImageBytes)
-                        .into(imageView)
-            } catch(exc: KotlinNullPointerException) {
-                Log.e("GlideError", "AddNews loading error " + exc.message)
-            }
+            loadImage(selectedImageBytes, this, imageView)
 
             uploadImageTask = StorageUtil.uploadNewsImage(selectedImageBytes!!, { urlImage:String ->
                 urlNewsImage = urlImage

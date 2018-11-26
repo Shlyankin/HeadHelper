@@ -2,12 +2,11 @@ package com.heads.thinking.headhelper
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.ImageButton
 import android.widget.ProgressBar
 import com.github.chrisbanes.photoview.PhotoView
-import com.heads.thinking.headhelper.glide.GlideApp
+import com.heads.thinking.headhelper.glide.loadImage
 import com.heads.thinking.headhelper.util.StorageUtil
 
 class PhotoViewerActivity : AppCompatActivity(), View.OnClickListener {
@@ -28,13 +27,7 @@ class PhotoViewerActivity : AppCompatActivity(), View.OnClickListener {
         onBack.setOnClickListener(this)
 
         picturePath = intent.getStringExtra("picturePath")
-        try {
-            val request = GlideApp.with(this)
-                    .load(StorageUtil.pathToReference(picturePath))
-                    .into(photoView)
-        } catch (exc: KotlinNullPointerException) {
-            Log.e("GlideError", "PhotoViewer error " + exc.message)
-        }
+        loadImage(StorageUtil.pathToReference(picturePath), this, photoView)
     }
 
     override fun onClick(view: View?) {

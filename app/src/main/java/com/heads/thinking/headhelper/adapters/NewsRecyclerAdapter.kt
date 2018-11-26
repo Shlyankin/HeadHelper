@@ -6,7 +6,6 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.support.v7.widget.CardView
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,13 +14,12 @@ import android.widget.Toast
 import com.heads.thinking.headhelper.App
 import com.heads.thinking.headhelper.NewsViewerActivity
 import com.heads.thinking.headhelper.R
-import com.heads.thinking.headhelper.glide.GlideApp
+import com.heads.thinking.headhelper.glide.loadImage
 import com.heads.thinking.headhelper.models.News
 import com.heads.thinking.headhelper.mvvm.DataViewModel
 import com.heads.thinking.headhelper.util.FirestoreUtil
 import com.heads.thinking.headhelper.util.StorageUtil
 import de.hdodenhof.circleimageview.CircleImageView
-import java.text.DateFormat
 import java.text.SimpleDateFormat
 
 class NewsRecyclerAdapter(val context: Context, var list:ArrayList<News>, val dataViewModel: DataViewModel): RecyclerView.Adapter<NewsRecyclerAdapter.ViewHolder>() {
@@ -82,19 +80,10 @@ class NewsRecyclerAdapter(val context: Context, var list:ArrayList<News>, val da
             //заполняем атрибуты view
             itemHeader.text = news.tittle
             dateTV.text = SimpleDateFormat.getInstance().format(news.date)
-            try {
                 if (news.picturePath != null)
-                    GlideApp.with(imageView)
-                            .load(StorageUtil.pathToReference(news.picturePath))
-                            .into(imageView)
-                else {
-                    GlideApp.with(imageView)
-                            .load(R.drawable.logo)
-                            .into(imageView)
-                }
-            } catch (exc: KotlinNullPointerException) {
-                Log.e("GlideError", "NewsImage loading error " + exc.message)
-            }
+                    loadImage(StorageUtil.pathToReference(news.picturePath), imageView.context, imageView)
+                else
+                    loadImage(R.drawable.logo, imageView.context, imageView)
         }
     }
 }

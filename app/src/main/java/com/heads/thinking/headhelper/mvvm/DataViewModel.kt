@@ -58,7 +58,7 @@ class DataViewModel: ViewModel() {
     }
 
     private fun addUserListener() {
-        userListener = FirestoreUtil.addUserListener { documentSnapshot, firebaseFirestoreException ->
+        userListener = FirestoreUtil.addCurrentUserListener { documentSnapshot, firebaseFirestoreException ->
             if(firebaseFirestoreException == null && documentSnapshot?.exists() ?: false) {
                 user.postValue(documentSnapshot?.toObject(User::class.java))
                 updateListeners()
@@ -71,6 +71,8 @@ class DataViewModel: ViewModel() {
                                                                    firebaseFirestoreException ->
             if (isSuccessful && !(querySnapshot?.isEmpty ?: true)) {
                 messages.postValue(toListMessages(querySnapshot!!))
+            } else {
+                messages.postValue(ArrayList<Message>())
             }
         }
     }
