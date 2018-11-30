@@ -51,7 +51,5 @@ class MainActivity : AppCompatActivity() {
         navigation.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener)
         viewModel = ViewModelProviders.of(this).get(MainActivityViewModel::class.java)
         navigation.selectedItemId = viewModel.selectedMenusId
-        //TODO предложить пользователю вступить в группу
-        //checkUser()
     }
 }

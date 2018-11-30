@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
     tools:context=".SplashActivity">
 
     <LinearLayout
@@ -23,6 +24,7 @@
             android:layout_gravity="center"
             android:layout_weight="5"
             android:adjustViewBounds="true"
+            android:scaleType="center"
             app:srcCompat="@drawable/logo" />
 
         <ImageView
@@ -33,7 +35,8 @@
             android:layout_weight="2"
             android:adjustViewBounds="true"
             android:scaleType="fitCenter"
-            app:srcCompat="@drawable/head_helper" />
+            app:srcCompat="@drawable/head_helper"
+            android:padding="10dp"/>
 
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

@@ -1,5 +1,7 @@
 package com.heads.thinking.headhelper.adapters
 
+import android.content.Context
+import android.support.v4.app.Fragment
 import android.support.v7.widget.CardView
 import android.support.v7.widget.RecyclerView
 import android.view.Gravity
@@ -16,7 +18,7 @@ import com.heads.thinking.headhelper.util.FirestoreUtil
 import com.heads.thinking.headhelper.util.StorageUtil
 import de.hdodenhof.circleimageview.CircleImageView
 
-class ChatRecyclerAdapter(var messages: ArrayList<Message>, var members: HashMap<String, User>):
+class ChatRecyclerAdapter(val fragment: Fragment, var messages: ArrayList<Message>, var members: HashMap<String, User>):
         RecyclerView.Adapter<ChatRecyclerAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, p1: Int): ViewHolder {
@@ -29,6 +31,15 @@ class ChatRecyclerAdapter(var messages: ArrayList<Message>, var members: HashMap
     }
 
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
+        // пользователь написавший сообщение может быть не в группе, поэтому надо подгрузить его данные отдельно
+        if(!members.contains(messages[position].userRef)){
+            FirestoreUtil.getUser(messages[position].userRef, { isSuccessful, user ->
+                if(isSuccessful)
+                    members.put(user!!.id, user)
+                if(!this.fragment.isRemoving)
+                    this.notifyDataSetChanged()
+            })
+        }
         viewHolder.bindItems(messages[position], members.get(messages[position].userRef))
     }
 

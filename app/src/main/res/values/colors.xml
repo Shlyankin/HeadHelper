@@ -6,9 +6,9 @@
     <color name="text_shadow">#7f000000</color>
     <color name="grey">#00ffffff</color>
     <color name="fonbtn">#8500ccb4</color>
-    <color name="text">#059097</color>
+    <color name="selected_menu_color">#059097</color>
     <color name="red">#e1ff0000</color>
-    e8b2cde1
+
     <color name = "background_second">#e86dc3ff</color>
     <color name = "background">#e8b2cde1</color>
     <color name = "menu">#b5284c63</color>
@@ -16,4 +16,12 @@
     <color name="accent_material_dark">#b1f92525</color>
     <color name="foreground_material_dark">#fefefe</color>
     <color name="secondary_text_default_material_light">#cbfd9b62</color>
+
+    <color name="card_color">#a9d3dc</color>
+    <color name="primary">#448aff</color>
+    <color name="light">#83b9ff</color>
+    <color name="dark"> #005ecb </color>
+    <color name="custom_text"> #000000</color>
+    <color name="ground"> #f1f8e9 </color>
+
 </resources>

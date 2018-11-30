@@ -2,12 +2,13 @@
 
     <style name="AppCompat" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:actionBarSize">0dp</item>
-        <item name="android:windowBackground">@color/background</item>
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="android:colorBackground">@color/background</item>
-        <item name="android:colorForeground">@color/foreground_material_dark</item>
-        <item name="android:textColorPrimary">@color/alternative</item>
+        <item name="android:windowBackground">@color/ground</item>
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/dark</item>
+        <item name="android:colorBackground">@color/ground</item>
+        <item name="android:colorForeground">@color/dark</item>
+        <item name="android:textColor">@color/alternative</item>
+        <item name="android:textColorPrimary">@android:color/black</item>
         <item name="android:textColorPrimaryInverse">@android:color/black</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>

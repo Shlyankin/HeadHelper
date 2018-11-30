@@ -5,6 +5,7 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
@@ -26,6 +27,7 @@ import com.heads.thinking.headhelper.glide.loadImage
 import com.heads.thinking.headhelper.models.User
 import com.heads.thinking.headhelper.mvvm.DataViewModel
 import com.heads.thinking.headhelper.util.CustomImageManager
+import com.heads.thinking.headhelper.glide.CustomRequestListener
 import com.heads.thinking.headhelper.util.StorageUtil
 import com.heads.thinking.headhelper.util.FirestoreUtil
 
@@ -80,12 +82,14 @@ class CabinetFragment : Fragment(), View.OnClickListener {
         dataViewModel.getUser().observe(this.activity!!, object : Observer<User> {
             override fun onChanged(changedUser: User?) {
                 if (changedUser != null) {
-                    progressBar.visibility = View.GONE
                     usersNameTV.text = changedUser.name
                     groupIdTV.text = changedUser.groupId ?: ""
                     if (changedUser.profilePicturePath != null && this@CabinetFragment.activity != null)
                         loadImage(StorageUtil.pathToReference(changedUser.profilePicturePath),
-                                this@CabinetFragment.context, avatarIV)
+                                this@CabinetFragment.context, avatarIV, CustomRequestListener {
+                            progressBar.visibility = View.GONE
+                        })
+                    else progressBar.visibility = View.GONE
                 }
             }
         })

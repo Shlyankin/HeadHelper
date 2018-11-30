@@ -64,7 +64,6 @@
                 android:linksClickable="true"
                 android:padding="10dp"
                 android:text="Message"
-                android:textColor="@color/alternative"
                 android:textIsSelectable="true"
                 android:textSize="22sp" />
         </LinearLayout>

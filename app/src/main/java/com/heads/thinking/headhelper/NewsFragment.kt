@@ -56,11 +56,7 @@ class NewsFragment : Fragment(), View.OnClickListener {
         newsRecyclerView.adapter = adapterNewsRecyclerAdapter
         addNewsBtn = view.findViewById(R.id.addNewsFab)
         addNewsBtn.setOnClickListener(this)
-        return view
-    }
 
-    override fun onStart() {
-        super.onStart()
         dataViewModel.getUser().observe(this.activity!!, Observer<User> { user: User? ->
             if(user != null && user.privilege != 0) {
                 addNewsBtn.show()
@@ -79,5 +75,6 @@ class NewsFragment : Fragment(), View.OnClickListener {
                         Toast.LENGTH_SHORT).show()
             }
         })
+        return view
     }
 }

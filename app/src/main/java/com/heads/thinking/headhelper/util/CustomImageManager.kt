@@ -10,7 +10,9 @@ import android.provider.MediaStore
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.ActivityCompat.requestPermissions
 import android.support.v4.content.FileProvider
+import com.heads.thinking.headhelper.App
 import com.heads.thinking.headhelper.BuildConfig
+import org.jetbrains.anko.activityManager
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -25,6 +27,7 @@ object CustomImageManager {
 
 
     fun getPhotoMakerIntent(activity: Activity): Intent? {
+        activity
         //Проверяем разрешение на работу с камерой
         var isCameraPermissionGranted = ActivityCompat.checkSelfPermission(activity, android.Manifest.permission.CAMERA) === PackageManager.PERMISSION_GRANTED
         //Проверяем разрешение на работу с внешнем хранилещем телефона
@@ -42,13 +45,10 @@ object CustomImageManager {
             } else {
                 permissions = arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
             }
+
             //Запрашиваем разрешения у пользователя
             requestPermissions(activity, permissions, REQUEST_CODE_PERMISSION_RECEIVE_CAMERA)
-            //снова проверяем разрешения и запускаем метод заново, если разрешения получены
-            isCameraPermissionGranted = ActivityCompat.checkSelfPermission(activity, android.Manifest.permission.CAMERA) === PackageManager.PERMISSION_GRANTED
-            isWritePermissionGranted = ActivityCompat.checkSelfPermission(activity, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) === PackageManager.PERMISSION_GRANTED
-            if (isCameraPermissionGranted && isWritePermissionGranted)
-                getPhotoMakerIntent(activity)
+            //TODO пробовать еще раз, но необходимо получить в callback результат
             return null
         } else {
             //Если все разрешения получены

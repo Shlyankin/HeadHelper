@@ -13,6 +13,12 @@ object FirestoreUtil {
     private val firestoreInstance: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
     private var groupReference: DocumentReference? = null
     var currentUser: User? = null
+        get() {
+            if(field == null) {
+                userSignIn()
+                return null
+            } else return field
+        }
 
     // ссылка на текущего пользователя
     private val currentUserDocRef: DocumentReference
@@ -28,9 +34,10 @@ object FirestoreUtil {
         if(userListener == null) {
             userListener = currentUserDocRef.addSnapshotListener { documentSnapshot: DocumentSnapshot?, firebaseFirestoreException: FirebaseFirestoreException? ->
                 if (firebaseFirestoreException == null && documentSnapshot?.exists() ?: false) {
-                    currentUser = documentSnapshot!!.toObject(User::class.java)
-                    if (currentUser?.groupId != null)
-                        groupReference = firestoreInstance.collection("groups").document(currentUser?.groupId!!)
+                    val user = documentSnapshot!!.toObject(User::class.java)
+                    currentUser = user
+                    if (user?.groupId != null)
+                        groupReference = firestoreInstance.collection("groups").document(user?.groupId!!)
                 }
             }
         }
@@ -63,6 +70,7 @@ object FirestoreUtil {
                         } else onChange(false, null)
                     }
         } else {
+            onChange(false, null)
             return null
         }
     }
@@ -86,6 +94,9 @@ object FirestoreUtil {
     // добавить слушателя для текущего пользователя
     fun addCurrentUserListener(onChange: (documentSnapshot: DocumentSnapshot?,
                                    firebaseFirestoreException: FirebaseFirestoreException?) -> Unit) : ListenerRegistration {
+        // метод get() этого объекта чекает на null,
+        // а методы обновления ссылок в ViewModel обращаются к currentUser, поэтому стоит заранее его проверить
+        currentUser
         return currentUserDocRef.addSnapshotListener{ documentSnapshot: DocumentSnapshot?,
                                                firebaseFirestoreException: FirebaseFirestoreException? ->
                 onChange(documentSnapshot, firebaseFirestoreException)
@@ -125,18 +136,22 @@ object FirestoreUtil {
             userFieldMap["profilePicturePath"] = profilePicturePath
         if (groupId != null) {
             val user = currentUser
-                if (user != null && user.groupId != null && user.groupId != "")
+            if(user != null) {
+                if (user.groupId != null && user.groupId != "")
                     firestoreInstance.collection("groups")
                             .document("${currentUser!!.groupId}").collection("members")
                             .document(FirebaseAuth.getInstance().currentUser?.uid.toString()).delete()
-            userFieldMap["groupId"] = groupId
-            val member = mutableMapOf<String, Any>()
-            member [FirebaseAuth.getInstance().currentUser?.uid
-                    ?: throw NullPointerException("UID is null.")] = FirebaseAuth.getInstance().currentUser!!.displayName.toString()
-            firestoreInstance.collection("groups").document(groupId)
-                .collection("members").document(FirebaseAuth.getInstance().currentUser?.uid.toString())
-                    .set(mapOf(Pair("memberRef",
-                            FirebaseAuth.getInstance().currentUser?.uid.toString())))
+                userFieldMap["groupId"] = groupId
+                val member = mutableMapOf<String, Any>()
+                member[FirebaseAuth.getInstance().currentUser?.uid
+                        ?: throw NullPointerException("UID is null.")] = FirebaseAuth.getInstance().currentUser!!.displayName.toString()
+                firestoreInstance.collection("groups").document(groupId)
+                        .collection("members").document(FirebaseAuth.getInstance().currentUser?.uid.toString())
+                        .set(mapOf(Pair("memberRef",
+                                FirebaseAuth.getInstance().currentUser?.uid.toString())))
+            } else {
+                return
+            }
         }
         currentUserDocRef.update(userFieldMap)
     }
@@ -205,9 +220,14 @@ object FirestoreUtil {
                 for(usersId in members!!.keys) {
                     firestoreInstance.collection("users").document(usersId).update(data)
                 }
-                val ref = firestoreInstance.collection("groups").document(currentUser?.groupId!!)
-                ref.collection("members")
-                onComplete(true,"")
+                val user = currentUser
+                if(user != null) {
+                    val ref = firestoreInstance.collection("groups").document(user.groupId!!)
+                    ref.collection("members")
+                    onComplete(true, "")
+                } else {
+                    onComplete(false, "Обновляю данные. Повторите еще раз")
+                }
             } else {
                 onComplete(false, "не могу получить список пользователей")
             }

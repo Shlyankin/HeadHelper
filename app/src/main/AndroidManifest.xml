@@ -50,6 +50,11 @@
             android:focusableInTouchMode="true"
             android:theme="@style/AppCompat" />
 
+        <activity android:name=".PhotoViewerActivity"
+            android:descendantFocusability="beforeDescendants"
+            android:focusableInTouchMode="true"
+            android:theme="@style/AppCompat" />
+
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="${applicationId}.provider"
@@ -60,7 +65,6 @@
                 android:resource="@xml/provider_paths" />
         </provider>
 
-        <activity android:name=".PhotoViewerActivity"></activity>
     </application>
 
 </manifest>

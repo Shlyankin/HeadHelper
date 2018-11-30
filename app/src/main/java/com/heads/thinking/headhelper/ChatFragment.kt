@@ -24,6 +24,7 @@ import kotlin.collections.HashMap
 
 class ChatFragment : Fragment(), View.OnClickListener {
 
+
     lateinit var editMessageET: EditText
     lateinit var sendMessageButton: ImageButton
     lateinit var chatRecyclerView: RecyclerView
@@ -64,7 +65,7 @@ class ChatFragment : Fragment(), View.OnClickListener {
 
         chatRecyclerView.layoutManager = LinearLayoutManager(App.instance?.applicationContext, LinearLayoutManager.VERTICAL, false)
         chatRecyclerView.hasFixedSize()
-        chatRecyclerAdapter = ChatRecyclerAdapter(ArrayList<Message>(), HashMap<String, User>())
+        chatRecyclerAdapter = ChatRecyclerAdapter(this, ArrayList<Message>(), HashMap<String, User>())
         chatRecyclerView.adapter = chatRecyclerAdapter
 
         return view
