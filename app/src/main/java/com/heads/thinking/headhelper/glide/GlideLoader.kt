@@ -3,14 +3,9 @@ package com.heads.thinking.headhelper.glide
 import android.app.Activity
 import android.content.Context
 import android.graphics.drawable.Drawable
-import android.support.v4.app.Fragment
 import android.util.Log
 import android.widget.ImageView
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.Target
-import com.bumptech.glide.request.target.ViewTarget
 
 /**
  Содержимое данного пакета контролирует загрузку изображений библиотекой Glide.

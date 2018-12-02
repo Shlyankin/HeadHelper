@@ -32,13 +32,14 @@
 
     <ImageButton
         android:id="@+id/onBack"
-        android:layout_width="60dp"
-        android:layout_height="30dp"
+        android:layout_width="80dp"
+        android:layout_height="40dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
-        android:adjustViewBounds="false"
+        android:adjustViewBounds="true"
         android:background="@android:color/transparent"
-        android:src="@drawable/icon_back"
+        android:scaleType="fitCenter"
+        android:src="@drawable/icon_back_black"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

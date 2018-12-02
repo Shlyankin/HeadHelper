@@ -20,7 +20,7 @@ import org.jetbrains.anko.support.v4.indeterminateProgressDialog
 
 class ChangeGroupDialog: DialogFragment() {
 
-    lateinit var idGroupET: EditText
+    private lateinit var idGroupET: EditText
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {

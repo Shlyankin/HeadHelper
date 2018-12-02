@@ -1,6 +1,5 @@
 package com.heads.thinking.headhelper.adapters
 
-import android.content.Context
 import android.support.v4.app.Fragment
 import android.support.v7.widget.CardView
 import android.support.v7.widget.RecyclerView

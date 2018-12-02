@@ -19,8 +19,8 @@ import com.heads.thinking.headhelper.R
 
 class ChangePasswordDialog : DialogFragment() {
 
-    lateinit var oldPasswordET: EditText
-    lateinit var newPasswordET: EditText
+    private lateinit var oldPasswordET: EditText
+    private lateinit var newPasswordET: EditText
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,

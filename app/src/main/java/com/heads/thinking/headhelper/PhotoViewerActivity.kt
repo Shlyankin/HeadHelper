@@ -11,10 +11,10 @@ import com.heads.thinking.headhelper.util.StorageUtil
 
 class PhotoViewerActivity : AppCompatActivity(), View.OnClickListener {
 
-    lateinit var progressBar: ProgressBar
-    lateinit var picturePath: String
-    lateinit var onBack: ImageButton
-    lateinit var photoView: PhotoView
+    private lateinit var progressBar: ProgressBar
+    private lateinit var picturePath: String
+    private lateinit var onBack: ImageButton
+    private lateinit var photoView: PhotoView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

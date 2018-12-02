@@ -21,12 +21,12 @@ import kotlinx.android.synthetic.main.fragment_chat.*
 
 class NewsFragment : Fragment(), View.OnClickListener {
 
-    lateinit var progressBar: ProgressBar
-    lateinit var dataViewModel: DataViewModel
-    lateinit var addNewsBtn: FloatingActionButton
-    lateinit var newsRecyclerView: RecyclerView
-    lateinit var adapterNewsRecyclerAdapter: NewsRecyclerAdapter
-    lateinit var newsList: ArrayList<News>
+    private lateinit var progressBar: ProgressBar
+    private lateinit var dataViewModel: DataViewModel
+    private lateinit var addNewsBtn: FloatingActionButton
+    private lateinit var newsRecyclerView: RecyclerView
+    private lateinit var adapterNewsRecyclerAdapter: NewsRecyclerAdapter
+    private lateinit var newsList: ArrayList<News>
 
     var listReady: Boolean = false
 

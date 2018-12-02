@@ -1,8 +1,6 @@
 package com.heads.thinking.headhelper.glide
 
 import android.graphics.drawable.Drawable
-import android.view.View
-import android.widget.ProgressBar
 import android.widget.Toast
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException

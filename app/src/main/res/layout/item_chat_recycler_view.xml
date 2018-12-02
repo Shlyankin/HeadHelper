@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="right"
         android:layout_margin="8dp"
-        app:cardCornerRadius="50dp"
+        app:cardCornerRadius="20dp"
         app:cardElevation="3dp"
         app:contentPadding="10dp">
 
@@ -44,13 +44,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
+                    android:ellipsize="end"
                     android:fontFamily="sans-serif-condensed"
+                    android:maxLines="1"
                     android:padding="5dp"
                     android:text="Username"
                     android:textColor="@color/colorAccent"
-                    android:textSize="18sp"
-                    android:maxLines="1"
-                    android:ellipsize="end"/>
+                    android:textSize="18sp" />
 
             </LinearLayout>
 

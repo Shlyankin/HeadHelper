@@ -15,7 +15,7 @@
         <android.support.constraint.ConstraintLayout
             android:id="@+id/constraint_layout2"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             tools:context=".SignInActivity">
 
             <LinearLayout

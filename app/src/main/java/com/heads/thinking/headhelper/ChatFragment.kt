@@ -25,13 +25,12 @@ import kotlin.collections.HashMap
 class ChatFragment : Fragment(), View.OnClickListener {
 
 
-    lateinit var editMessageET: EditText
-    lateinit var sendMessageButton: ImageButton
-    lateinit var chatRecyclerView: RecyclerView
-    lateinit var chatRecyclerAdapter: ChatRecyclerAdapter
-    lateinit var progressBar: ProgressBar
-
-    lateinit var dataViewModel: DataViewModel
+    private lateinit var editMessageET: EditText
+    private lateinit var sendMessageButton: ImageButton
+    private lateinit var chatRecyclerView: RecyclerView
+    private lateinit var chatRecyclerAdapter: ChatRecyclerAdapter
+    private lateinit var progressBar: ProgressBar
+    private lateinit var dataViewModel: DataViewModel
 
     override fun onClick(view: View?) {
         when(view?.id) {
