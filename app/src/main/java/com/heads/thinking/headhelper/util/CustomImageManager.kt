@@ -45,10 +45,8 @@ object CustomImageManager {
             } else {
                 permissions = arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
             }
-
             //Запрашиваем разрешения у пользователя
             requestPermissions(activity, permissions, REQUEST_CODE_PERMISSION_RECEIVE_CAMERA)
-            //TODO пробовать еще раз, но необходимо получить в callback результат
             return null
         } else {
             //Если все разрешения получены

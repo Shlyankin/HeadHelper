@@ -56,9 +56,6 @@ class MembersRecyclerViewAdapter(var members: ArrayList<User>) : RecyclerView.Ad
             noPrivRadioButton = itemView.findViewById(R.id.radioButton1)
             moderatorRadioButton = itemView.findViewById(R.id.radioButton2)
 
-            //необходимо обрабатывать нажатие на каждую radio button, т.к. если повесить listener на изменение,
-            //то при наличие 2 админов(поле privilege = 2. такое вполне можно организовать)
-            // может возникнуть бесконечное обращение к БД
             val onComlete : (isSuccessful: Boolean, message: String) -> Unit = {
                 isSuccessful: Boolean, message: String ->
                 if(!isSuccessful) {
@@ -74,7 +71,6 @@ class MembersRecyclerViewAdapter(var members: ArrayList<User>) : RecyclerView.Ad
 
             usernameTV.setText(user.name)
             if(user.profilePicturePath != null) {
-
                 loadImage(
                         StorageUtil.pathToReference(user.profilePicturePath), membersAvatar.context, membersAvatar)
             }

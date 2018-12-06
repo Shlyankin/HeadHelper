@@ -118,6 +118,7 @@ object FirestoreUtil {
         }
     }
 
+    //обновить привилегии пользователя
     fun updateMembersPrivileges(userId: String, privilege: Int, onComplete: (isSuccessful: Boolean, message: String) -> Unit) {
         val userFieldMap = mutableMapOf<String, Any>()
         userFieldMap["privilege"] = privilege
@@ -210,30 +211,6 @@ object FirestoreUtil {
             }
     }
 
-    //TODO нельзя удалять коллекции в firebase. Что делать?
-    fun removeGroup(onComplete: (isSuccessful:Boolean, message: String) -> Unit) {
-        getMemb { isSuccessful, members ->
-            if(isSuccessful) {
-                val data = mutableMapOf<String, Any>()
-                data["groupId"] ="start"
-                data["privilege"] = 0
-                for(usersId in members!!.keys) {
-                    firestoreInstance.collection("users").document(usersId).update(data)
-                }
-                val user = currentUser
-                if(user != null) {
-                    val ref = firestoreInstance.collection("groups").document(user.groupId!!)
-                    ref.collection("members")
-                    onComplete(true, "")
-                } else {
-                    onComplete(false, "Обновляю данные. Повторите еще раз")
-                }
-            } else {
-                onComplete(false, "не могу получить список пользователей")
-            }
-        }
-    }
-
     // отправка новости в группу пользователя
     fun sendNews(news: News, onComplete: (isSuccessful: Boolean, message: String) -> Unit) {
         val documentReference = groupReference
@@ -297,6 +274,7 @@ object FirestoreUtil {
     //удалить любой слушатель
     fun removeListener(registration: ListenerRegistration) = registration.remove()
 
+    //отправка сообщения на сервер
     fun sendMessage(message: Message, onComplete: (isSuccessful: Boolean) -> Unit) {
         val documentReference = FirestoreUtil.groupReference
         if(documentReference != null) {
@@ -306,6 +284,7 @@ object FirestoreUtil {
         }
     }
 
+    //добавляет слушатель на сообщения чата
     fun addChatMessagesListener(onChange: (isSuccessful: Boolean, message: String, querySnapshot: QuerySnapshot?, firebaseFirestoreException: FirebaseFirestoreException?) -> Unit): ListenerRegistration? {
         val documentReference = FirestoreUtil.groupReference
         if(documentReference != null) {

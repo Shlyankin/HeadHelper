@@ -77,7 +77,6 @@ class NewsRecyclerAdapter(val context: Context, var list:ArrayList<News>, val da
             newsCardView = itemView.findViewById(R.id.newsCardView)
             dateTV = itemView.findViewById(R.id.dateTV)
 
-            //заполняем атрибуты view
             itemHeader.text = news.tittle
             dateTV.text = SimpleDateFormat.getInstance().format(news.date)
                 if (news.picturePath != null)

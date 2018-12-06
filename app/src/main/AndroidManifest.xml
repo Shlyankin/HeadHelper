@@ -33,7 +33,7 @@
             android:name=".MainActivity"
             android:descendantFocusability="beforeDescendants"
             android:focusableInTouchMode="true"
-            android:theme="@style/AppCompat"></activity>
+            android:theme="@style/AppCompat"/>
         <activity
             android:name=".SignInActivity"
             android:descendantFocusability="beforeDescendants"

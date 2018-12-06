@@ -50,6 +50,10 @@ class MainActivity : AppCompatActivity() {
         navigation = findViewById(R.id.navigation)
         navigation.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener)
         viewModel = ViewModelProviders.of(this).get(MainActivityViewModel::class.java)
+    }
+
+    override fun onResume() {
+        super.onResume()
         navigation.selectedItemId = viewModel.selectedMenusId
     }
 }

@@ -35,7 +35,7 @@ class ChangePasswordDialog : DialogFragment() {
         builder.setView(layoutInflater)
 
         newPasswordET = layoutInflater!!.findViewById(R.id.newPasswordET)
-        oldPasswordET = layoutInflater!!.findViewById(R.id.oldPasswordET)
+        oldPasswordET = layoutInflater.findViewById(R.id.oldPasswordET)
 
         builder.setTitle("Смена группы")
         builder.setPositiveButton("Сменить", { dialogInterface: DialogInterface, i: Int ->

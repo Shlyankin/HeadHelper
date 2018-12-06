@@ -12,14 +12,12 @@ class CustomRequestListener(val onReady: (isSuccessfull: Boolean) -> Unit) : Req
 
     override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable>?, isFirstResource: Boolean): Boolean {
         Toast.makeText(App.instance, "Ошибка при загрузке изображения", Toast.LENGTH_LONG)
-        //check progress bar visibility
         onReady(false)
         return false
     }
 
     override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
         onReady(true)
-
         return false
     }
 }

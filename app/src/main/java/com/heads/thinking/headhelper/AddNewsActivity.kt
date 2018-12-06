@@ -81,6 +81,7 @@ class AddNewsActivity: AppCompatActivity(), View.OnClickListener {
         uploadImageTask = viewModel.uploadTask
         startUpload(uploadImageTask)
 
+        //отслеживаем появление клавиатуры на экране
         contentView?.viewTreeObserver?.addOnGlobalLayoutListener {
             val r: Rect = Rect()
             contentView!!.getWindowVisibleDisplayFrame(r)
@@ -89,13 +90,12 @@ class AddNewsActivity: AppCompatActivity(), View.OnClickListener {
 
             if(keyPadHeight > screenHeight * 0.15) {
                 // 0.15 to determinate keypad height
-                //keyboard is opened
+                //клавиатура открыта
                 addNewsFab.hide()
                 addImageFab.hide()
                 backFab.hide()
             } else {
-                //keyboard is closed
-
+                //клавиатура закрыта
                 addNewsFab.show()
                 addImageFab.show()
                 backFab.show()
@@ -223,7 +223,7 @@ class AddNewsActivity: AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    fun startUpload(uploadImageTask: UploadTask?) {
+    private fun startUpload(uploadImageTask: UploadTask?) {
         if(uploadImageTask != null && uploadImageTask.isInProgress) {
             uploadProgressBar.visibility = View.VISIBLE
             addNewsFab.hide()
@@ -238,7 +238,7 @@ class AddNewsActivity: AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    fun cancelUpload(uploadImageTask: UploadTask?) {
+    private fun cancelUpload(uploadImageTask: UploadTask?) {
         if(uploadImageTask != null) {
             uploadImageTask.cancel()
             uploadProgressBar.visibility = View.GONE
