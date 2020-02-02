@@ -1,4 +1,4 @@
-package com.heads.thinking.headhelper
+package com.heads.thinking.headhelper.ui.activities
 
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.heads.thinking.headhelper.R
 import com.heads.thinking.headhelper.util.FirestoreUtil
 
 class SplashActivity : AppCompatActivity() {

@@ -1,4 +1,4 @@
-package com.heads.thinking.headhelper
+package com.heads.thinking.headhelper.ui.activities
 
 import com.heads.thinking.headhelper.mvvm.MainActivityViewModel
 import android.arch.lifecycle.ViewModelProviders
@@ -6,13 +6,16 @@ import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
+import com.heads.thinking.headhelper.ui.fragments.CabinetFragment
+import com.heads.thinking.headhelper.ui.fragments.ChatFragment
+import com.heads.thinking.headhelper.ui.fragments.NewsFragment
+import com.heads.thinking.headhelper.R
+import kotlinx.android.synthetic.main.activity_main.*
+
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var viewModel : MainActivityViewModel
-    private lateinit var navigation: BottomNavigationView
-
-    private val fragmentsArray = ArrayList<Fragment>()
 
     private val onNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
@@ -33,21 +36,17 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun loadFragment(fragment: Fragment?): Boolean {
-        if (fragment != null) {
-            supportFragmentManager
-                    .beginTransaction()
-                    .replace(R.id.fragment_layout, fragment)
-                    .commit()
-            return true
-        }
-        return false
+    private fun loadFragment(fragment: Fragment): Boolean {
+        supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.fragment_layout, fragment)
+                .commit()
+        return true
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        navigation = findViewById(R.id.navigation)
         navigation.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener)
         viewModel = ViewModelProviders.of(this).get(MainActivityViewModel::class.java)
     }

@@ -1,4 +1,4 @@
-package com.heads.thinking.headhelper
+package com.heads.thinking.headhelper.ui.activities
 
 import android.content.Intent
 import android.os.Build
@@ -7,54 +7,31 @@ import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.*
+import com.heads.thinking.headhelper.R
 import com.heads.thinking.headhelper.glide.loadImage
 import com.heads.thinking.headhelper.models.News
 import com.heads.thinking.headhelper.models.User
 import com.heads.thinking.headhelper.glide.CustomRequestListener
 import com.heads.thinking.headhelper.util.FirestoreUtil
 import com.heads.thinking.headhelper.util.StorageUtil
+import kotlinx.android.synthetic.main.activity_news_viewer.*
 
 class NewsViewerActivity : AppCompatActivity(), View.OnClickListener {
 
     private var adminFlag = false
 
-    private lateinit var progressBar: ProgressBar
-
-    private lateinit var imageView: ImageView
-    private lateinit var tittleTV: TextView
-    private lateinit var textTV: TextView
-    private lateinit var authorTV: TextView
-    private lateinit var editFab: FloatingActionButton
-    private lateinit var backFab: FloatingActionButton
     private lateinit var news: News
-    private lateinit var authorAvatarIV: ImageView
-    private lateinit var scrollView: ScrollView
-    private lateinit var linearLayout: LinearLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_news_viewer)
-
-        progressBar = findViewById(R.id.progressBar)
-        imageView = findViewById(R.id.mainIV)
-        tittleTV = findViewById(R.id.tittleTV)
-        textTV = findViewById(R.id.textTV)
-        authorTV = findViewById(R.id.authorTV)
-        authorAvatarIV = findViewById(R.id.authorAvatarIV)
-        editFab = findViewById(R.id.editFab)
-        backFab = findViewById(R.id.backFab)
-        scrollView = findViewById(R.id.scrollView)
-        linearLayout = findViewById(R.id.linearLayout)
-
-        editFab.setOnClickListener(this)
-        backFab.setOnClickListener(this)
 
         if(FirestoreUtil.currentUser?.privilege ?: 0 > 0) {
             editFab.show()
             adminFlag = true
         }
 
-        imageView.setOnClickListener(this)
+        mainIV.setOnClickListener(this)
 
         news = intent.getParcelableExtra("news")
         tittleTV.text = news.tittle
@@ -95,14 +72,14 @@ class NewsViewerActivity : AppCompatActivity(), View.OnClickListener {
     override fun onStart() {
         super.onStart()
         if(news.picturePath != null)
-            loadImage(StorageUtil.pathToReference(news.picturePath ?: ""), this, imageView
+            loadImage(StorageUtil.pathToReference(news.picturePath ?: ""), this, mainIV
                     , CustomRequestListener {
                 progressBar.visibility = View.GONE
             }) //
     }
 
-    override fun onClick(view: View?) {
-        when(view!!.id) {
+    override fun onClick(view: View) {
+        when(view.id) {
             R.id.backFab -> {
                 onBackPressed()
             }

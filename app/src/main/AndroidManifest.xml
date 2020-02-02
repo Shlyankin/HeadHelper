@@ -22,7 +22,7 @@
         android:windowSoftInputMode="adjustPan|adjustResize|stateHidden"
         tools:replace="android:appComponentFactory">
 
-        <activity android:name=".SplashActivity">
+        <activity android:name=".ui.activities.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -30,27 +30,27 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.activities.MainActivity"
             android:descendantFocusability="beforeDescendants"
             android:focusableInTouchMode="true"
             android:theme="@style/AppCompat"/>
         <activity
-            android:name=".SignInActivity"
+            android:name=".ui.activities.SignInActivity"
             android:descendantFocusability="beforeDescendants"
             android:focusableInTouchMode="true"
             android:theme="@style/AppCompat" />
         <activity
-            android:name=".NewsViewerActivity"
+            android:name=".ui.activities.NewsViewerActivity"
             android:descendantFocusability="beforeDescendants"
             android:focusableInTouchMode="true"
             android:theme="@style/AppCompat" />
         <activity
-            android:name=".AddNewsActivity"
+            android:name=".ui.activities.AddNewsActivity"
             android:descendantFocusability="beforeDescendants"
             android:focusableInTouchMode="true"
             android:theme="@style/AppCompat" />
 
-        <activity android:name=".PhotoViewerActivity"
+        <activity android:name=".ui.activities.PhotoViewerActivity"
             android:descendantFocusability="beforeDescendants"
             android:focusableInTouchMode="true"
             android:theme="@style/AppCompat" />

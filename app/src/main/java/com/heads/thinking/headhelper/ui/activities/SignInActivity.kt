@@ -1,4 +1,4 @@
-package com.heads.thinking.headhelper
+package com.heads.thinking.headhelper.ui.activities
 
 import android.app.Activity
 import android.content.Intent
@@ -11,6 +11,7 @@ import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.ErrorCodes
 import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
+import com.heads.thinking.headhelper.R
 import com.heads.thinking.headhelper.util.FirestoreUtil
 import kotlinx.android.synthetic.main.activity_sign_in.*
 import org.jetbrains.anko.clearTask
@@ -22,7 +23,6 @@ import org.jetbrains.anko.newTask
 class SignInActivity : AppCompatActivity(), View.OnClickListener {
 
     private val CODE_SIGN_IN = 1;
-    private lateinit var signInBtn: CardView
 
     private var signProvider = listOf(AuthUI.IdpConfig.EmailBuilder()
             .setAllowNewAccounts(true)
@@ -32,12 +32,10 @@ class SignInActivity : AppCompatActivity(), View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sign_in)
-
-        signInBtn = findViewById(R.id.signInBtn)
     }
 
-    override fun onClick(view: View?) {
-        when (view!!.id) {
+    override fun onClick(view: View) {
+        when (view.id) {
             R.id.signInBtn -> {
                 val intent = AuthUI.getInstance().createSignInIntentBuilder()
                         .setAvailableProviders(signProvider)

@@ -1,11 +1,10 @@
-package com.heads.thinking.headhelper
+package com.heads.thinking.headhelper.ui.fragments
 
 import android.app.Activity.RESULT_OK
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.DialogInterface
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
@@ -15,11 +14,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.support.v7.app.AlertDialog
-import android.support.v7.widget.CardView
 import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.widget.*
 import com.firebase.ui.auth.AuthUI
+import com.heads.thinking.headhelper.App
+import com.heads.thinking.headhelper.R
+import com.heads.thinking.headhelper.ui.activities.SplashActivity
 import com.heads.thinking.headhelper.adapters.MembersRecyclerViewAdapter
 import com.heads.thinking.headhelper.dialogs.ChangeGroupDialog
 import com.heads.thinking.headhelper.dialogs.ChangePasswordDialog
@@ -30,59 +30,39 @@ import com.heads.thinking.headhelper.util.CustomImageManager
 import com.heads.thinking.headhelper.glide.CustomRequestListener
 import com.heads.thinking.headhelper.util.StorageUtil
 import com.heads.thinking.headhelper.util.FirestoreUtil
+import kotlinx.android.synthetic.main.fragment_cabinet.*
 
 import java.io.ByteArrayOutputStream
 
 
 class CabinetFragment : Fragment(), View.OnClickListener {
 
-    private lateinit var progressBar: ProgressBar
-    private lateinit var avatarIV: ImageView
-    private lateinit var usersNameTV: TextView
-    private lateinit var groupIdTV: TextView
-
-    private lateinit var membersCardView: CardView
-    private lateinit var membersRecyclerView: RecyclerView
     private lateinit var membersRecyclerViewAdapter: MembersRecyclerViewAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_cabinet, container, false)
+        return inflater.inflate(R.layout.fragment_cabinet, container, false)
+    }
 
-        //init views
-        val makePhotoBtn: ImageButton = view.findViewById(R.id.makePhotoBtn)
-        val changeGroupBtn: Button = view.findViewById(R.id.changeGroupBtn)
-        val changePasswordBtn: Button = view.findViewById(R.id.changePasswordBtn)
-        val signOutBtn: Button = view.findViewById(R.id.signOutBtn)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        // set btn listeners
+        changePasswordBtn.setOnClickListener(this)
+        changeGroupBtn.setOnClickListener(this)
+        signOutBtn.setOnClickListener(this)
+        makePhotoBtn.setOnClickListener(this)
 
-        avatarIV = view.findViewById(R.id.avatarIV)
-        usersNameTV = view.findViewById(R.id.usernameTV)
-        groupIdTV = view.findViewById(R.id.groupIdTV)
-        progressBar = view.findViewById(R.id.progressBar)
-        //end init views
 
-        membersCardView = view.findViewById(R.id.membersCardView)
-        membersRecyclerView = view.findViewById(R.id.membersRecyclerView)
         membersRecyclerView.layoutManager = LinearLayoutManager(App.instance?.applicationContext,
                 LinearLayoutManager.VERTICAL, false)
         membersRecyclerView.hasFixedSize()
         membersRecyclerViewAdapter = MembersRecyclerViewAdapter(ArrayList())
         membersRecyclerView.adapter = membersRecyclerViewAdapter
-
-        makePhotoBtn.setOnClickListener(this)
-        changeGroupBtn.setOnClickListener(this)
-        changePasswordBtn.setOnClickListener(this)
-        signOutBtn.setOnClickListener(this)
-        return view
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
         val dataViewModel : DataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
-        dataViewModel.getUser().observe(this.activity!!, object : Observer<User> {
+        dataViewModel.getUser().observe(this@CabinetFragment, object : Observer<User> {
             override fun onChanged(changedUser: User?) {
                 if (changedUser != null) {
-                    usersNameTV.text = changedUser.name
+                    usernameTV.text = changedUser.name
                     groupIdTV.text = changedUser.groupId ?: ""
                     if (changedUser.profilePicturePath != null && this@CabinetFragment.activity != null)
                         loadImage(StorageUtil.pathToReference(changedUser.profilePicturePath),
@@ -93,7 +73,7 @@ class CabinetFragment : Fragment(), View.OnClickListener {
                 }
             }
         })
-        dataViewModel.getMembers().observe(this@CabinetFragment.activity!!, object : Observer<HashMap<String, User>> {
+        dataViewModel.getMembers().observe(this@CabinetFragment, object : Observer<HashMap<String, User>> {
             override fun onChanged(map: HashMap<String, User>?) {
                 if (map != null) {
                     membersRecyclerViewAdapter.members = ArrayList<User>().apply {
@@ -106,8 +86,8 @@ class CabinetFragment : Fragment(), View.OnClickListener {
         })
     }
 
-    override fun onClick(view: View?) {
-        when(view!!.id) {
+    override fun onClick(view: View) {
+        when(view.id) {
             R.id.changeGroupBtn -> {
                 val user = FirestoreUtil.currentUser
                 if(user != null) {

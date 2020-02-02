@@ -12,7 +12,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import com.heads.thinking.headhelper.App
-import com.heads.thinking.headhelper.NewsViewerActivity
+import com.heads.thinking.headhelper.ui.activities.NewsViewerActivity
 import com.heads.thinking.headhelper.R
 import com.heads.thinking.headhelper.glide.loadImage
 import com.heads.thinking.headhelper.models.News

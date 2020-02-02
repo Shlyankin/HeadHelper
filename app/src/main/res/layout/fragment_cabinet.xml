@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".CabinetFragment">
+    tools:context=".ui.fragments.CabinetFragment">
 
 
     <ScrollView
@@ -15,7 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            tools:context=".CabinetFragment">
+            tools:context=".ui.fragments.CabinetFragment">
 
 
             <android.support.v7.widget.CardView
@@ -106,12 +106,12 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:background="@android:color/transparent"
-                        android:onClick="onClick"
                         android:padding="5dp"
                         android:src="@android:drawable/ic_menu_camera"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/frameLayout" />
+                        app:layout_constraintTop_toBottomOf="@+id/frameLayout"
+                        android:onClick="onClick"/>
 
                 </android.support.constraint.ConstraintLayout>
             </android.support.v7.widget.CardView>
@@ -145,6 +145,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:onClick="onClick"
                             android:text="Сменить пароль"
                             android:textColor="@color/colorAccent"
                             app:layout_constraintStart_toStartOf="parent"
@@ -156,6 +157,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:onClick="onClick"
                             android:text="Сменить группу"
                             android:textColor="@color/colorAccent"
                             app:layout_constraintEnd_toEndOf="parent"
@@ -168,6 +170,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
+                        android:onClick="onClick"
                         android:text="Выйти из аккаунта"
                         android:textColor="@color/colorAccent"
                         app:layout_constraintStart_toStartOf="parent"

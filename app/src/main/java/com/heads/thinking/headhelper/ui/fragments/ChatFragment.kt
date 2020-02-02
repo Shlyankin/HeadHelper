@@ -1,8 +1,7 @@
-package com.heads.thinking.headhelper
+package com.heads.thinking.headhelper.ui.fragments
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
-import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
@@ -11,26 +10,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import com.heads.thinking.headhelper.App
+import com.heads.thinking.headhelper.R
 import com.heads.thinking.headhelper.adapters.ChatRecyclerAdapter
 import com.heads.thinking.headhelper.models.Message
 import com.heads.thinking.headhelper.models.User
 import com.heads.thinking.headhelper.mvvm.DataViewModel
 import com.heads.thinking.headhelper.util.FirestoreUtil
-import kotlinx.coroutines.CoroutineStart
-import java.time.Instant
+import kotlinx.android.synthetic.main.fragment_chat.*
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 class ChatFragment : Fragment(), View.OnClickListener {
 
-
-    private lateinit var editMessageET: EditText
-    private lateinit var sendMessageButton: ImageButton
-    private lateinit var chatRecyclerView: RecyclerView
-    private lateinit var chatRecyclerAdapter: ChatRecyclerAdapter
-    private lateinit var progressBar: ProgressBar
     private lateinit var dataViewModel: DataViewModel
+    private lateinit var chatRecyclerAdapter: ChatRecyclerAdapter
 
     override fun onClick(view: View?) {
         when(view?.id) {
@@ -54,26 +49,21 @@ class ChatFragment : Fragment(), View.OnClickListener {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_chat, container, false)
+        return view
+    }
 
-        sendMessageButton = view.findViewById(R.id.sendMessageBtn)
-        editMessageET = view.findViewById(R.id.editMessageET)
-        chatRecyclerView = view.findViewById(R.id.chatRecyclerView)
-        progressBar = view.findViewById(R.id.progressBar)
-
-        sendMessageButton.setOnClickListener(this)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        // set btn listeners
+        sendMessageBtn.setOnClickListener(this)
 
         chatRecyclerView.layoutManager = LinearLayoutManager(App.instance?.applicationContext, LinearLayoutManager.VERTICAL, false)
         chatRecyclerView.hasFixedSize()
         chatRecyclerAdapter = ChatRecyclerAdapter(this, ArrayList<Message>(), HashMap<String, User>())
         chatRecyclerView.adapter = chatRecyclerAdapter
 
-        return view
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
         dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
-        dataViewModel.getMembers().observe(this.activity!!, object : Observer<HashMap<String, User>> {
+        dataViewModel.getMembers().observe(this@ChatFragment, object : Observer<HashMap<String, User>> {
             override fun onChanged(membersMap: HashMap<String, User>?) {
                 if(membersMap != null) {
                     chatRecyclerAdapter.members = membersMap
@@ -81,7 +71,7 @@ class ChatFragment : Fragment(), View.OnClickListener {
                 }
             }
         })
-        dataViewModel.getMessagesArray().observe(this.activity!!, object : Observer<ArrayList<Message>> {
+        dataViewModel.getMessagesArray().observe(this@ChatFragment, object : Observer<ArrayList<Message>> {
             override fun onChanged(messages: ArrayList<Message>?) {
                 progressBar.visibility = View.GONE
                 if (messages != null) {
@@ -89,7 +79,7 @@ class ChatFragment : Fragment(), View.OnClickListener {
                     chatRecyclerAdapter.notifyDataSetChanged()
                     if(chatRecyclerView.verticalScrollbarPosition == chatRecyclerAdapter.itemCount - 2 || chatRecyclerView.verticalScrollbarPosition == 0) // check this
                         chatRecyclerView.getLayoutManager()
-                            ?.scrollToPosition(chatRecyclerAdapter.itemCount - 1)
+                                ?.scrollToPosition(chatRecyclerAdapter.itemCount - 1)
                 }
             }
         })

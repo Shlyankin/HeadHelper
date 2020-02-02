@@ -1,9 +1,8 @@
-package com.heads.thinking.headhelper
+package com.heads.thinking.headhelper.ui.activities
 
 import android.app.Activity
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Rect
 import android.net.Uri
@@ -11,11 +10,12 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.view.View
 import android.widget.*
 import com.google.firebase.storage.OnProgressListener
 import com.google.firebase.storage.UploadTask
+import com.heads.thinking.headhelper.App
+import com.heads.thinking.headhelper.R
 import com.heads.thinking.headhelper.glide.loadImage
 import com.heads.thinking.headhelper.models.News
 import com.heads.thinking.headhelper.mvvm.AddNewsActivityViewModel
@@ -23,7 +23,6 @@ import com.heads.thinking.headhelper.util.CustomImageManager
 import com.heads.thinking.headhelper.util.FirestoreUtil
 import com.heads.thinking.headhelper.util.StorageUtil
 import kotlinx.android.synthetic.main.activity_add_news.*
-import kotlinx.android.synthetic.main.fragment_news.*
 import org.jetbrains.anko.contentView
 import java.io.ByteArrayOutputStream
 import java.util.*
@@ -34,31 +33,12 @@ class AddNewsActivity: AppCompatActivity(), View.OnClickListener {
     private var uploadImageTask : UploadTask? = null
     private var selectedImageBytes : ByteArray? = null
     private var urlNewsImage : String? = null
-    private lateinit var textET: EditText
-    private lateinit var headerET: EditText
-    private lateinit var imageView: ImageView
-    private lateinit var uploadProgressBar: ProgressBar
-    private lateinit var viewModel : AddNewsActivityViewModel
 
-    private lateinit var addNewsFab: FloatingActionButton
-    private lateinit var addImageFab: FloatingActionButton
-    private lateinit var backFab: FloatingActionButton
+    private lateinit var viewModel : AddNewsActivityViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_news)
-
-        headerET = findViewById(R.id.headerET)
-        textET = findViewById(R.id.textET)
-        imageView = findViewById(R.id.imageView)
-        uploadProgressBar = findViewById(R.id.uploadProgressBar)
-        addNewsFab = findViewById(R.id.addNewsFab)
-        addImageFab = findViewById(R.id.addImageFab)
-        backFab = findViewById(R.id.backFab)
-
-        addImageFab.setOnClickListener(this)
-        backFab.setOnClickListener(this)
-        addNewsFab.setOnClickListener(this)
 
         viewModel = ViewModelProviders.of(this).get(AddNewsActivityViewModel::class.java)
 
@@ -103,28 +83,30 @@ class AddNewsActivity: AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    override fun onClick(view: View?) {
-        when (view!!.id) {
+    override fun onClick(view: View) {
+        when (view.id) {
             R.id.backFab -> {
                 onBackPressed()
             }
             R.id.addImageFab -> {
-                if (uploadImageTask == null) {
-                    // изображение не загружалось ранее
-                    CustomImageManager.getPhotoMakerIntent(this)?.let {
-                        startActivityForResult(it, CustomImageManager.REQUEST_CODE_TAKE_PHOTO)
+                when {
+                    uploadImageTask == null -> // изображение не загружалось ранее
+                        CustomImageManager.getPhotoMakerIntent(this)?.let {
+                            startActivityForResult(it, CustomImageManager.REQUEST_CODE_TAKE_PHOTO)
+                        }
+                    uploadImageTask!!.isSuccessful -> {
+                        // изображение уже загружено и его надо удалить
+                        StorageUtil.deleteNewsImage(urlNewsImage!!, {})
+                        CustomImageManager.getPhotoMakerIntent(this)?.let {
+                            startActivityForResult(it, CustomImageManager.REQUEST_CODE_TAKE_PHOTO)
+                        }
                     }
-                } else if(uploadImageTask!!.isSuccessful) {
-                    // изображение уже загружено и его надо удалить
-                    StorageUtil.deleteNewsImage(urlNewsImage!!, {})
-                    CustomImageManager.getPhotoMakerIntent(this)?.let {
-                        startActivityForResult(it, CustomImageManager.REQUEST_CODE_TAKE_PHOTO)
-                    }
-                } else {
-                    // изображение в процессе загрузки и надо отменить операцию
-                    cancelUpload(uploadImageTask)// Отменяем загрузку
-                    CustomImageManager.getPhotoMakerIntent(this)?.let {
-                        startActivityForResult(it, CustomImageManager.REQUEST_CODE_TAKE_PHOTO)
+                    else -> {
+                        // изображение в процессе загрузки и надо отменить операцию
+                        cancelUpload(uploadImageTask)// Отменяем загрузку
+                        CustomImageManager.getPhotoMakerIntent(this)?.let {
+                            startActivityForResult(it, CustomImageManager.REQUEST_CODE_TAKE_PHOTO)
+                        }
                     }
                 }
             }
@@ -227,12 +209,10 @@ class AddNewsActivity: AppCompatActivity(), View.OnClickListener {
         if(uploadImageTask != null && uploadImageTask.isInProgress) {
             uploadProgressBar.visibility = View.VISIBLE
             addNewsFab.hide()
-            uploadImageTask.addOnProgressListener(object : OnProgressListener<UploadTask.TaskSnapshot> {
-                override fun onProgress(taskSnapshot: UploadTask.TaskSnapshot?) {
-                    if (taskSnapshot?.bytesTransferred == taskSnapshot?.totalByteCount) {
-                        uploadProgressBar.visibility = View.GONE
-                        addNewsFab.show()
-                    }
+            uploadImageTask.addOnProgressListener(OnProgressListener<UploadTask.TaskSnapshot> { taskSnapshot ->
+                if (taskSnapshot?.bytesTransferred == taskSnapshot?.totalByteCount) {
+                    uploadProgressBar.visibility = View.GONE
+                    addNewsFab.show()
                 }
             })
         }

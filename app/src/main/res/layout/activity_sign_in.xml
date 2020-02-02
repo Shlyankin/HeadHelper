@@ -5,7 +5,7 @@
     android:id="@+id/constraint_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SignInActivity"
+    tools:context=".ui.activities.SignInActivity"
     android:background="@color/colorPrimary">
 
     <ScrollView
@@ -16,7 +16,7 @@
             android:id="@+id/constraint_layout2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            tools:context=".SignInActivity">
+            tools:context=".ui.activities.SignInActivity">
 
             <LinearLayout
                 android:id="@+id/linearLayout3"

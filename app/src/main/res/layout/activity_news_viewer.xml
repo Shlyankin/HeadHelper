@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".NewsViewerActivity">
+    tools:context=".ui.activities.NewsViewerActivity">
 
     <ScrollView
         android:id="@+id/scrollView"
@@ -175,7 +175,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/icon_edit"
-        app:hideMotionSpec="@anim/fui_slide_in_right" />
+        app:hideMotionSpec="@anim/fui_slide_in_right"/>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/backFab"
